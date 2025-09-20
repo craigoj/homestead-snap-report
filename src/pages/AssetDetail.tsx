@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -237,9 +237,11 @@ export default function AssetDetail() {
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm">
-            <Edit className="mr-2 h-4 w-4" />
-            Edit
+          <Button variant="outline" size="sm" asChild>
+            <Link to={`/assets/${asset.id}/edit`}>
+              <Edit className="mr-2 h-4 w-4" />
+              Edit
+            </Link>
           </Button>
           <Button variant="outline" size="sm" onClick={deleteAsset} className="text-destructive">
             <Trash2 className="mr-2 h-4 w-4" />
@@ -265,9 +267,22 @@ export default function AssetDetail() {
                   {photos.map((photo) => (
                     <div key={photo.id} className="relative group">
                       <div className="aspect-square bg-muted rounded-lg overflow-hidden">
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Camera className="h-12 w-12 text-muted-foreground" />
-                        </div>
+                        <img
+                          src={`https://hfiznpxdopjdwtuenxqf.supabase.co/storage/v1/object/public/asset-photos/${photo.file_path}`}
+                          alt={`Asset photo`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            // Fallback to icon if image fails to load
+                            (e.target as HTMLImageElement).style.display = 'none';
+                            const parent = (e.target as HTMLImageElement).parentElement;
+                            if (parent && !parent.querySelector('.fallback-icon')) {
+                              const icon = document.createElement('div');
+                              icon.className = 'fallback-icon w-full h-full flex items-center justify-center absolute inset-0';
+                              icon.innerHTML = '<svg class="h-12 w-12 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>';
+                              parent.appendChild(icon);
+                            }
+                          }}
+                        />
                       </div>
                       {photo.is_primary && (
                         <Badge className="absolute top-2 left-2" variant="secondary">

@@ -2,6 +2,8 @@ import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { Camera, Upload, X, ImageIcon } from 'lucide-react';
 
 interface PhotoUploadProps {
@@ -11,6 +13,7 @@ interface PhotoUploadProps {
 }
 
 export const PhotoUpload = ({ onPhotosUploaded, maxPhotos = 5, existingPhotos = [] }: PhotoUploadProps) => {
+  const { user } = useAuth();
   const [uploadedPhotos, setUploadedPhotos] = useState<string[]>(existingPhotos);
   const [uploading, setUploading] = useState(false);
 
@@ -52,10 +55,28 @@ export const PhotoUpload = ({ onPhotosUploaded, maxPhotos = 5, existingPhotos = 
           continue;
         }
 
-        // Create a placeholder URL for the photo
-        // In a real implementation, this would upload to Supabase Storage
-        const photoUrl = `assets/${Date.now()}_${i}_${file.name}`;
-        newPhotos.push(photoUrl);
+        // Upload to Supabase Storage
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}_${i}.${fileExt}`;
+        const filePath = `${user!.id}/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('asset-photos')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (uploadError) {
+          toast({
+            title: "Upload Failed",
+            description: `Failed to upload ${file.name}: ${uploadError.message}`,
+            variant: "destructive",
+          });
+          continue;
+        }
+
+        newPhotos.push(filePath);
       }
 
       const updatedPhotos = [...uploadedPhotos, ...newPhotos];
@@ -172,9 +193,22 @@ export const PhotoUpload = ({ onPhotosUploaded, maxPhotos = 5, existingPhotos = 
           {uploadedPhotos.map((photo, index) => (
             <Card key={index} className="relative group">
               <div className="aspect-square bg-muted rounded-lg overflow-hidden">
-                <div className="w-full h-full flex items-center justify-center">
-                  <ImageIcon className="h-12 w-12 text-muted-foreground" />
-                </div>
+              <img 
+                src={`https://hfiznpxdopjdwtuenxqf.supabase.co/storage/v1/object/public/asset-photos/${photo}`}
+                alt={`Asset photo ${index + 1}`}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  // Fallback to icon if image fails to load
+                  (e.target as HTMLImageElement).style.display = 'none';
+                  const parent = (e.target as HTMLImageElement).parentElement;
+                  if (parent) {
+                    const icon = document.createElement('div');
+                    icon.className = 'w-full h-full flex items-center justify-center';
+                    icon.innerHTML = '<svg class="h-12 w-12 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>';
+                    parent.appendChild(icon);
+                  }
+                }}
+              />
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <Button
                     type="button"

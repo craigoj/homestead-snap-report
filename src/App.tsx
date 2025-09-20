@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import Properties from "./pages/Properties";
 import AddAsset from "./pages/AddAsset";
 import AssetDetail from "./pages/AssetDetail";
+import EditAsset from "./pages/EditAsset";
 import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
 
@@ -52,6 +53,13 @@ const App = () => (
               <ProtectedRoute>
                 <Layout>
                   <AssetDetail />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/assets/:id/edit" element={
+              <ProtectedRoute>
+                <Layout>
+                  <EditAsset />
                 </Layout>
               </ProtectedRoute>
             } />

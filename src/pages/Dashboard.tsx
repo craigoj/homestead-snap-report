@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
+import { AssetCard } from '@/components/AssetCard';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { 
   Home, 
   Package, 
@@ -16,7 +18,10 @@ import {
   DollarSign,
   TrendingUp,
   Camera,
-  Filter
+  Filter,
+  ArrowUpDown,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -25,7 +30,7 @@ interface Asset {
   title: string;
   category: string;
   condition: string;
-  estimated_value: number;
+  estimated_value: number | null;
   created_at: string;
   properties: {
     name: string;
@@ -33,6 +38,10 @@ interface Asset {
   rooms: {
     name: string;
   } | null;
+  asset_photos?: {
+    file_path: string;
+    is_primary: boolean;
+  }[];
 }
 
 interface DashboardStats {
@@ -48,17 +57,23 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [sortBy, setSortBy] = useState<'created_at' | 'title' | 'estimated_value'>('created_at');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const itemsPerPage = 12;
 
   useEffect(() => {
     if (user) {
+      setLoading(true);
       fetchDashboardData();
     }
-  }, [user]);
+  }, [user, searchTerm, categoryFilter, sortBy, sortOrder, currentPage]);
 
   const fetchDashboardData = async () => {
     try {
-      // Fetch recent assets
-      const { data: assetsData, error: assetsError } = await supabase
+      // Build query with filters
+      let query = supabase
         .from('assets')
         .select(`
           id,
@@ -68,14 +83,34 @@ export default function Dashboard() {
           estimated_value,
           created_at,
           properties (name),
-          rooms (name)
-        `)
-        .order('created_at', { ascending: false })
-        .limit(10);
+          rooms (name),
+          asset_photos (file_path, is_primary)
+        `, { count: 'exact' });
+
+      // Apply filters
+      if (searchTerm) {
+        query = query.ilike('title', `%${searchTerm}%`);
+      }
+      if (categoryFilter !== 'all') {
+        query = query.eq('category', categoryFilter as any);
+      }
+
+      // Apply sorting
+      query = query.order(sortBy, { ascending: sortOrder === 'asc' });
+
+      // Apply pagination
+      const from = (currentPage - 1) * itemsPerPage;
+      const to = from + itemsPerPage - 1;
+      query = query.range(from, to);
+
+      const { data: assetsData, error: assetsError, count } = await query;
 
       if (assetsError) throw assetsError;
 
-      // Fetch stats
+      setAssets(assetsData || []);
+      setTotalCount(count || 0);
+
+      // Fetch stats (separate query for performance)
       const { data: statsData, error: statsError } = await supabase
         .from('assets')
         .select('estimated_value');
@@ -88,7 +123,6 @@ export default function Dashboard() {
 
       const totalValue = statsData?.reduce((sum, asset) => sum + (asset.estimated_value || 0), 0) || 0;
 
-      setAssets(assetsData || []);
       setStats({
         totalAssets: statsData?.length || 0,
         totalValue,
@@ -105,11 +139,27 @@ export default function Dashboard() {
     }
   };
 
-  const filteredAssets = assets.filter(asset => {
-    const matchesSearch = asset.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === 'all' || asset.category === categoryFilter;
-    return matchesSearch && matchesCategory;
-  });
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
+
+  const handleSort = (field: typeof sortBy) => {
+    if (field === sortBy) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(field);
+      setSortOrder('desc');
+    }
+    setCurrentPage(1);
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
+
+  const handleCategoryFilter = (value: string) => {
+    setCategoryFilter(value);
+    setCurrentPage(1);
+  };
 
   if (loading) {
     return (
@@ -137,7 +187,8 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <ErrorBoundary>
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -227,14 +278,47 @@ export default function Dashboard() {
         </Card>
       )}
 
-      {/* Recent Assets */}
+      {/* Assets Inventory */}
       {stats.totalAssets > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Recent Assets</CardTitle>
-            <CardDescription>
-              Your most recently added inventory items
-            </CardDescription>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+              <div>
+                <CardTitle>Asset Inventory</CardTitle>
+                <CardDescription>
+                  {totalCount} total assets • Page {currentPage} of {totalPages}
+                </CardDescription>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleSort('title')}
+                  className="text-xs"
+                >
+                  <ArrowUpDown className="mr-1 h-3 w-3" />
+                  Name {sortBy === 'title' && (sortOrder === 'asc' ? '↑' : '↓')}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleSort('estimated_value')}
+                  className="text-xs"
+                >
+                  <ArrowUpDown className="mr-1 h-3 w-3" />
+                  Value {sortBy === 'estimated_value' && (sortOrder === 'asc' ? '↑' : '↓')}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleSort('created_at')}
+                  className="text-xs"
+                >
+                  <ArrowUpDown className="mr-1 h-3 w-3" />
+                  Date {sortBy === 'created_at' && (sortOrder === 'asc' ? '↑' : '↓')}
+                </Button>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             {/* Search and Filter */}
@@ -244,11 +328,11 @@ export default function Dashboard() {
                 <Input
                   placeholder="Search assets..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => handleSearch(e.target.value)}
                   className="pl-10"
                 />
               </div>
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <Select value={categoryFilter} onValueChange={handleCategoryFilter}>
                 <SelectTrigger className="w-full sm:w-48">
                   <Filter className="mr-2 h-4 w-4" />
                   <SelectValue placeholder="Category" />
@@ -269,68 +353,86 @@ export default function Dashboard() {
               </Select>
             </div>
 
-            {/* Assets List */}
-            <div className="space-y-4">
-              {filteredAssets.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  {searchTerm || categoryFilter !== 'all' 
-                    ? 'No assets match your search criteria'
-                    : 'No assets found'
-                  }
-                </div>
-              ) : (
-                filteredAssets.map((asset) => (
-                  <div
-                    key={asset.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
-                        <Package className="h-6 w-6 text-muted-foreground" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold">{asset.title}</h4>
-                        <p className="text-sm text-muted-foreground">
-                          {asset.properties.name}
-                          {asset.rooms && ` • ${asset.rooms.name}`}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <Badge variant="secondary" className="capitalize">
-                        {asset.category}
-                      </Badge>
-                      <Badge 
-                        variant={asset.condition === 'excellent' ? 'default' : 
-                               asset.condition === 'good' ? 'secondary' : 'outline'}
-                        className="capitalize"
-                      >
-                        {asset.condition}
-                      </Badge>
-                      <div className="text-right">
-                        <p className="font-semibold">
-                          ${asset.estimated_value?.toLocaleString() || 'N/A'}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(asset.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-
-            {filteredAssets.length > 0 && (
-              <div className="mt-6 text-center">
-                <Button variant="outline" asChild>
-                  <Link to="/dashboard">View All Assets</Link>
-                </Button>
+            {/* Assets Grid */}
+            {assets.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                {searchTerm || categoryFilter !== 'all' 
+                  ? 'No assets match your search criteria'
+                  : 'No assets found'
+                }
               </div>
+            ) : (
+              <>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {assets.map((asset) => (
+                    <AssetCard 
+                      key={asset.id} 
+                      asset={asset}
+                      onEdit={(id) => console.log('Edit asset:', id)}
+                      onDelete={(id) => console.log('Delete asset:', id)}
+                    />
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center space-x-2 mt-6">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      Previous
+                    </Button>
+                    <div className="flex items-center space-x-1">
+                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                        const page = i + 1;
+                        const isCurrentPage = page === currentPage;
+                        return (
+                          <Button
+                            key={page}
+                            variant={isCurrentPage ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setCurrentPage(page)}
+                            className="w-8 h-8 p-0"
+                          >
+                            {page}
+                          </Button>
+                        );
+                      })}
+                      {totalPages > 5 && (
+                        <>
+                          <span className="text-muted-foreground">...</span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(totalPages)}
+                            className="w-8 h-8 p-0"
+                          >
+                            {totalPages}
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </CardContent>
         </Card>
       )}
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }

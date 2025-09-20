@@ -77,39 +77,58 @@ export default function AddAsset() {
   const performOCR = async (photoPath: string) => {
     setOcrLoading(true);
     try {
-      // This is a placeholder for OCR functionality
-      // In a real implementation, this would call an edge function
-      
-      // Simulate OCR processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Mock OCR results
-      const mockResults = {
-        title: 'Samsung 55" Smart TV',
-        brand: 'Samsung',
-        model: 'UN55TU8000',
-        category: 'electronics',
-        estimated_value: '650',
-      };
+      console.log('Processing OCR for:', photoPath);
 
+      // Get the full URL for the image
+      const { data: { publicUrl } } = supabase.storage
+        .from('asset-photos')
+        .getPublicUrl(photoPath);
+
+      // Call the OCR edge function
+      const { data: ocrResult, error: ocrError } = await supabase.functions.invoke('ocr-extract', {
+        body: { imageUrl: publicUrl }
+      });
+
+      if (ocrError) {
+        throw new Error(ocrError.message);
+      }
+
+      if (!ocrResult) {
+        throw new Error('No OCR result returned');
+      }
+
+      console.log('OCR Result:', ocrResult);
+
+      // Update form with OCR results
       setFormData(prev => ({
         ...prev,
-        ...mockResults,
+        title: ocrResult.title || prev.title,
+        description: ocrResult.description || prev.description,
+        brand: ocrResult.brand || prev.brand,
+        model: ocrResult.model || prev.model,
+        serial_number: ocrResult.serial_number || prev.serial_number,
+        category: ocrResult.category || prev.category,
+        estimated_value: ocrResult.estimated_value?.toString() || prev.estimated_value,
       }));
 
       toast({
         title: "OCR Complete",
-        description: "Asset details have been extracted from the photo. Please review and edit as needed.",
+        description: `Information extracted with ${ocrResult.confidence}% confidence. Please review and edit as needed.`,
       });
 
       // Log OCR success
       await supabase.rpc('log_audit_event', {
         p_event_type: 'ocr_success',
         p_entity_type: 'asset',
-        p_metadata: { confidence: 0.85, extracted_fields: Object.keys(mockResults) }
+        p_metadata: { 
+          confidence: ocrResult.confidence, 
+          extracted_text: ocrResult.extracted_text 
+        }
       });
 
     } catch (error: any) {
+      console.error('OCR processing failed:', error);
+      
       toast({
         title: "OCR Failed",
         description: "Couldn't extract details from the photo. Please enter details manually.",

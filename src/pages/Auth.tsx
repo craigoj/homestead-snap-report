@@ -1,25 +1,71 @@
 import { useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { Loader2, Home, Shield } from 'lucide-react';
+import { Loader2, Home, Shield, Mail, AlertCircle, CheckCircle } from 'lucide-react';
 
 export default function Auth() {
   const { user, signUp, signIn, signInWithMagicLink } = useAuth();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
+  const [confirmationEmail, setConfirmationEmail] = useState('');
+
+  // Handle email confirmation from URL
+  useEffect(() => {
+    const error = searchParams.get('error');
+    const errorDescription = searchParams.get('error_description');
+    
+    if (error) {
+      toast({
+        title: "Authentication Error",
+        description: errorDescription || error,
+        variant: "destructive",
+      });
+    } else if (searchParams.get('type') === 'signup') {
+      toast({
+        title: "Email Confirmed",
+        description: "Your email has been confirmed. You can now sign in.",
+      });
+    }
+  }, [searchParams]);
 
   // Redirect if already authenticated
   if (user) {
     return <Navigate to="/dashboard" replace />;
   }
+
+  const handleResendConfirmation = async () => {
+    if (!confirmationEmail) return;
+    
+    setLoading(true);
+    try {
+      const { error } = await signUp(confirmationEmail, 'temp_password', 'Resend');
+      if (error && !error.message.includes('User already registered')) {
+        toast({
+          title: "Error",
+          description: "Failed to resend confirmation email. Please try again.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Email Sent",
+          description: "We've sent another confirmation email. Please check your inbox.",
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +89,12 @@ export default function Auth() {
             description: "An account with this email already exists. Please sign in instead.",
             variant: "destructive",
           });
+        } else if (error.message.includes('email_address_invalid')) {
+          toast({
+            title: "Invalid Email",
+            description: "Please enter a valid email address. Demo emails like 'user@demo.com' are not allowed.",
+            variant: "destructive",
+          });
         } else {
           toast({
             title: "Sign Up Error",
@@ -51,6 +103,8 @@ export default function Auth() {
           });
         }
       } else {
+        setNeedsConfirmation(true);
+        setConfirmationEmail(email);
         toast({
           title: "Check Your Email",
           description: "We've sent you a confirmation link. Please check your email to complete signup.",
@@ -83,6 +137,20 @@ export default function Auth() {
             description: "The email or password you entered is incorrect.",
             variant: "destructive",
           });
+        } else if (error.message.includes('Email not confirmed')) {
+          setNeedsConfirmation(true);
+          setConfirmationEmail(email);
+          toast({
+            title: "Email Not Confirmed",
+            description: "Please check your email and click the confirmation link before signing in.",
+            variant: "destructive",
+          });
+        } else if (error.message.includes('email_address_invalid')) {
+          toast({
+            title: "Invalid Email",
+            description: "Please enter a valid email address. Demo emails like 'user@demo.com' are not allowed.",
+            variant: "destructive",
+          });
         } else {
           toast({
             title: "Sign In Error",
@@ -90,6 +158,11 @@ export default function Auth() {
             variant: "destructive",
           });
         }
+      } else {
+        toast({
+          title: "Welcome Back",
+          description: "You have successfully signed in.",
+        });
       }
     } finally {
       setLoading(false);
@@ -142,6 +215,24 @@ export default function Auth() {
           <p className="text-muted-foreground">Asset scanning & inventory for homeowners</p>
         </div>
 
+        {needsConfirmation && (
+          <Alert className="mb-4">
+            <Mail className="h-4 w-4" />
+            <AlertDescription className="flex items-center justify-between">
+              <span>Please confirm your email address: {confirmationEmail}</span>
+              <Button
+                variant="link"
+                size="sm"
+                onClick={handleResendConfirmation}
+                disabled={loading}
+                className="p-0 h-auto"
+              >
+                Resend
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <Card>
           <CardHeader>
             <CardTitle>Welcome</CardTitle>
@@ -165,7 +256,7 @@ export default function Auth() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your email"
+                      placeholder="Enter your email (use real email, not demo@example.com)"
                       disabled={loading}
                     />
                   </div>
@@ -227,7 +318,7 @@ export default function Auth() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your email"
+                      placeholder="Enter your real email address"
                       disabled={loading}
                     />
                   </div>

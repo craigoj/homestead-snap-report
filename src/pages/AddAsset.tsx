@@ -155,6 +155,7 @@ export default function AddAsset() {
       const { data: asset, error: assetError } = await supabase
         .from('assets')
         .insert([{
+          user_id: user!.id,
           title: formData.title.trim(),
           description: formData.description.trim() || null,
           category: formData.category as any || 'other',

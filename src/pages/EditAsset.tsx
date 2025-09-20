@@ -14,7 +14,10 @@ import {
   ArrowLeft,
   Package, 
   DollarSign,
-  Save
+  Save,
+  Brain,
+  Zap,
+  TrendingUp
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -46,6 +49,8 @@ export default function EditAsset() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [valuationLoading, setValuationLoading] = useState(false);
+  const [valuationResult, setValuationResult] = useState<any>(null);
   const [formData, setFormData] = useState<AssetForm>({
     title: '',
     description: '',
@@ -104,6 +109,89 @@ export default function EditAsset() {
       navigate('/dashboard');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getAIValuation = async () => {
+    if (!formData.title || !formData.category || !formData.condition) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in title, category, and condition before getting AI valuation.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setValuationLoading(true);
+    try {
+      // Get asset photos for the valuation
+      const { data: photos } = await supabase
+        .from('asset_photos')
+        .select('file_path')
+        .eq('asset_id', id)
+        .eq('is_primary', true)
+        .limit(1);
+
+      const valuationData = {
+        title: formData.title,
+        description: formData.description,
+        brand: formData.brand,
+        model: formData.model,
+        category: formData.category,
+        condition: formData.condition,
+        purchase_date: formData.purchase_date,
+        purchase_price: formData.purchase_price ? parseFloat(formData.purchase_price) : undefined,
+        imageUrl: photos && photos[0] ? supabase.storage.from('asset-photos').getPublicUrl(photos[0].file_path).data.publicUrl : undefined
+      };
+
+      const { data: result, error } = await supabase.functions.invoke('valuation-estimate', {
+        body: valuationData
+      });
+
+      if (error) throw error;
+
+      setValuationResult(result);
+      
+      toast({
+        title: "AI Valuation Complete",
+        description: `Estimated value: $${result.estimated_value} (${result.confidence}% confidence)`,
+      });
+
+      // Log valuation request
+      await supabase.rpc('log_audit_event', {
+        p_event_type: 'asset_created', // Using existing event type
+        p_entity_type: 'asset',
+        p_entity_id: id,
+        p_metadata: { 
+          action: 'ai_valuation_update',
+          estimated_value: result.estimated_value,
+          confidence: result.confidence
+        }
+      });
+
+    } catch (error: any) {
+      console.error('AI valuation failed:', error);
+      toast({
+        title: "Valuation Failed",
+        description: "Couldn't get AI valuation. Please try again or enter value manually.",
+        variant: "destructive",
+      });
+    } finally {
+      setValuationLoading(false);
+    }
+  };
+
+  const acceptAIValuation = () => {
+    if (valuationResult) {
+      setFormData(prev => ({
+        ...prev,
+        estimated_value: valuationResult.estimated_value.toString()
+      }));
+      setValuationResult(null);
+      toast({
+        title: "Valuation Applied",
+        description: `Set estimated value to $${valuationResult.estimated_value}`,
+      });
     }
   };
 
@@ -360,7 +448,28 @@ export default function EditAsset() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="estimated_value">Estimated Value</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="estimated_value">Estimated Value</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={getAIValuation}
+                      disabled={valuationLoading || !formData.title || !formData.category || !formData.condition}
+                    >
+                      {valuationLoading ? (
+                        <>
+                          <Zap className="mr-2 h-3 w-3 animate-pulse" />
+                          Getting AI Value...
+                        </>
+                      ) : (
+                        <>
+                          <Brain className="mr-2 h-3 w-3" />
+                          Get AI Value
+                        </>
+                      )}
+                    </Button>
+                  </div>
                   <div className="relative">
                     <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                     <Input
@@ -374,6 +483,38 @@ export default function EditAsset() {
                       className="pl-10"
                     />
                   </div>
+                  {valuationResult && (
+                    <div className="p-3 bg-muted rounded-lg space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <TrendingUp className="h-4 w-4 text-primary" />
+                          <span className="font-medium">AI Valuation</span>
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {valuationResult.confidence}% confidence
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span>Estimated Value:</span>
+                          <span className="font-semibold">${valuationResult.estimated_value}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Range:</span>
+                          <span>${valuationResult.value_range.min} - ${valuationResult.value_range.max}</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{valuationResult.reasoning}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button size="sm" onClick={acceptAIValuation}>
+                          Accept Value
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => setValuationResult(null)}>
+                          Dismiss
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="space-y-2">

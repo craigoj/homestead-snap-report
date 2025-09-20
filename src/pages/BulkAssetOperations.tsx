@@ -74,10 +74,10 @@ export default function BulkAssetOperations() {
 
   // Bulk update form
   const [bulkUpdateData, setBulkUpdateData] = useState({
-    property_id: '',
-    room_id: '',
-    category: '',
-    condition: '',
+    property_id: 'no-change',
+    room_id: 'no-change',
+    category: 'no-change',
+    condition: 'no-change',
     estimated_value: ''
   });
 
@@ -135,9 +135,9 @@ export default function BulkAssetOperations() {
   };
 
   const filteredAssets = assets.filter(asset => {
-    const matchesProperty = !filterProperty || asset.property_id === filterProperty;
-    const matchesRoom = !filterRoom || asset.room_id === filterRoom;
-    const matchesCategory = !filterCategory || asset.category === filterCategory;
+    const matchesProperty = !filterProperty || filterProperty === "all" || asset.property_id === filterProperty;
+    const matchesRoom = !filterRoom || filterRoom === "all" || asset.room_id === filterRoom;
+    const matchesCategory = !filterCategory || filterCategory === "all" || asset.category === filterCategory;
     const matchesSearch = !searchTerm || 
       asset.title.toLowerCase().includes(searchTerm.toLowerCase());
     
@@ -181,10 +181,10 @@ export default function BulkAssetOperations() {
 
     // Prepare update data (only include non-empty values)
     const updateData: any = {};
-    if (bulkUpdateData.property_id) updateData.property_id = bulkUpdateData.property_id;
-    if (bulkUpdateData.room_id) updateData.room_id = bulkUpdateData.room_id;
-    if (bulkUpdateData.category) updateData.category = bulkUpdateData.category;
-    if (bulkUpdateData.condition) updateData.condition = bulkUpdateData.condition;
+    if (bulkUpdateData.property_id && bulkUpdateData.property_id !== "no-change") updateData.property_id = bulkUpdateData.property_id;
+    if (bulkUpdateData.room_id && bulkUpdateData.room_id !== "no-change") updateData.room_id = bulkUpdateData.room_id;
+    if (bulkUpdateData.category && bulkUpdateData.category !== "no-change") updateData.category = bulkUpdateData.category;
+    if (bulkUpdateData.condition && bulkUpdateData.condition !== "no-change") updateData.condition = bulkUpdateData.condition;
     if (bulkUpdateData.estimated_value) updateData.estimated_value = parseFloat(bulkUpdateData.estimated_value);
 
     if (Object.keys(updateData).length === 0) {
@@ -230,10 +230,10 @@ export default function BulkAssetOperations() {
 
       // Reset form and selection
       setBulkUpdateData({
-        property_id: '',
-        room_id: '',
-        category: '',
-        condition: '',
+        property_id: 'no-change',
+        room_id: 'no-change',
+        category: 'no-change',
+        condition: 'no-change',
         estimated_value: ''
       });
       setSelectedAssets(new Set());
@@ -446,7 +446,7 @@ export default function BulkAssetOperations() {
                       <SelectValue placeholder="All Properties" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Properties</SelectItem>
+                      <SelectItem value="all">All Properties</SelectItem>
                       {properties.map(property => (
                         <SelectItem key={property.id} value={property.id}>
                           {property.name}
@@ -462,7 +462,7 @@ export default function BulkAssetOperations() {
                       <SelectValue placeholder="All Rooms" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Rooms</SelectItem>
+                      <SelectItem value="all">All Rooms</SelectItem>
                       {availableRooms.map(room => (
                         <SelectItem key={room.id} value={room.id}>
                           {room.name}
@@ -478,7 +478,7 @@ export default function BulkAssetOperations() {
                       <SelectValue placeholder="All Categories" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Categories</SelectItem>
+                      <SelectItem value="all">All Categories</SelectItem>
                       {categories.map(category => (
                         <SelectItem key={category} value={category}>
                           {category.charAt(0).toUpperCase() + category.slice(1)}
@@ -532,15 +532,19 @@ export default function BulkAssetOperations() {
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                   <div>
                     <Label>Move to Property</Label>
-                    <Select
-                      value={bulkUpdateData.property_id}
-                      onValueChange={(value) => setBulkUpdateData(prev => ({ ...prev, property_id: value, room_id: '' }))}
-                    >
+                     <Select
+                       value={bulkUpdateData.property_id}
+                       onValueChange={(value) => setBulkUpdateData(prev => ({ 
+                         ...prev, 
+                         property_id: value, 
+                         room_id: 'no-change' 
+                       }))}
+                     >
                       <SelectTrigger>
                         <SelectValue placeholder="No change" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">No change</SelectItem>
+                         <SelectItem value="no-change">No change</SelectItem>
                         {properties.map(property => (
                           <SelectItem key={property.id} value={property.id}>
                             {property.name}
@@ -554,13 +558,13 @@ export default function BulkAssetOperations() {
                     <Select
                       value={bulkUpdateData.room_id}
                       onValueChange={(value) => setBulkUpdateData(prev => ({ ...prev, room_id: value }))}
-                      disabled={!bulkUpdateData.property_id}
+                      disabled={!bulkUpdateData.property_id || bulkUpdateData.property_id === "no-change"}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="No change" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">No change</SelectItem>
+                         <SelectItem value="no-change">No change</SelectItem>
                         {rooms
                           .filter(room => room.property_id === bulkUpdateData.property_id)
                           .map(room => (
@@ -581,7 +585,7 @@ export default function BulkAssetOperations() {
                         <SelectValue placeholder="No change" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">No change</SelectItem>
+                         <SelectItem value="no-change">No change</SelectItem>
                         {categories.map(category => (
                           <SelectItem key={category} value={category}>
                             {category.charAt(0).toUpperCase() + category.slice(1)}
@@ -600,7 +604,7 @@ export default function BulkAssetOperations() {
                         <SelectValue placeholder="No change" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">No change</SelectItem>
+                        <SelectItem value="no-change">No change</SelectItem>
                         {conditions.map(condition => (
                           <SelectItem key={condition} value={condition}>
                             {condition.charAt(0).toUpperCase() + condition.slice(1)}

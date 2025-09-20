@@ -98,7 +98,9 @@ export const PropertyRoomSelector = ({
   };
 
   const handlePropertyChange = (value: string) => {
-    onPropertyChange(value);
+    // Convert "all" back to empty string for backwards compatibility
+    const propertyId = value === "all" ? "" : value;
+    onPropertyChange(propertyId);
     onRoomChange(''); // Clear room selection when property changes
   };
 
@@ -144,7 +146,7 @@ export const PropertyRoomSelector = ({
             </SelectTrigger>
             <SelectContent>
               {allowEmpty && (
-                <SelectItem value="">All Properties</SelectItem>
+                <SelectItem value="all">All Properties</SelectItem>
               )}
               {properties.map((property) => (
                 <SelectItem key={property.id} value={property.id}>
@@ -165,15 +167,19 @@ export const PropertyRoomSelector = ({
       {selectedPropertyId && (
         <div className="space-y-2">
           <Label htmlFor="room">Room (Optional)</Label>
-          <Select value={selectedRoomId} onValueChange={onRoomChange}>
+          <Select value={selectedRoomId} onValueChange={(value) => {
+            // Convert "all" and "none" back to empty string for backwards compatibility
+            const roomId = (value === "all" || value === "none") ? "" : value;
+            onRoomChange(roomId);
+          }}>
             <SelectTrigger>
               <SelectValue placeholder="Select a room (optional)" />
             </SelectTrigger>
             <SelectContent>
               {allowEmpty && (
-                <SelectItem value="">All Rooms</SelectItem>
+                <SelectItem value="all">All Rooms</SelectItem>
               )}
-              <SelectItem value="">No specific room</SelectItem>
+              <SelectItem value="none">No specific room</SelectItem>
               {rooms.map((room) => (
                 <SelectItem key={room.id} value={room.id}>
                   {room.name}

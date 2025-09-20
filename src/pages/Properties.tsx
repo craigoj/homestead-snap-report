@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -365,10 +366,10 @@ export default function Properties() {
             <Card key={property.id} className="relative group">
               <CardHeader>
                 <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-2">
+                  <Link to={`/properties/${property.id}`} className="flex items-center space-x-2 hover:opacity-75 transition-opacity">
                     <Home className="h-5 w-5 text-primary" />
                     <CardTitle className="text-lg">{property.name}</CardTitle>
-                  </div>
+                  </Link>
                   <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
                       <Edit className="h-4 w-4" />

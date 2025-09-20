@@ -10,10 +10,12 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Properties from "./pages/Properties";
+import PropertyDetail from "./pages/PropertyDetail";
 import AddAsset from "./pages/AddAsset";
 import AssetDetail from "./pages/AssetDetail";
 import EditAsset from "./pages/EditAsset";
 import Reports from "./pages/Reports";
+import BulkAssetOperations from "./pages/BulkAssetOperations";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +44,13 @@ const App = () => (
                 </Layout>
               </ProtectedRoute>
             } />
+            <Route path="/properties/:id" element={
+              <ProtectedRoute>
+                <Layout>
+                  <PropertyDetail />
+                </Layout>
+              </ProtectedRoute>
+            } />
             <Route path="/assets/add" element={
               <ProtectedRoute>
                 <Layout>
@@ -67,6 +76,13 @@ const App = () => (
               <ProtectedRoute>
                 <Layout>
                   <Reports />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/bulk-operations" element={
+              <ProtectedRoute>
+                <Layout>
+                  <BulkAssetOperations />
                 </Layout>
               </ProtectedRoute>
             } />

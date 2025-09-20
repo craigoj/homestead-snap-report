@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
-import { Home, Shield, Package, Plus, FileText, Settings, LogOut, Menu } from 'lucide-react';
+import { Home, Shield, Package, Plus, FileText, Settings, LogOut, Menu, Database } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
@@ -15,6 +15,7 @@ const navigation = [
   { name: 'Properties', href: '/properties', icon: Package },
   { name: 'Add Asset', href: '/assets/add', icon: Plus },
   { name: 'Reports', href: '/reports', icon: FileText },
+  { name: 'Bulk Operations', href: '/bulk-operations', icon: Database },
 ];
 
 export const Layout = ({ children }: LayoutProps) => {

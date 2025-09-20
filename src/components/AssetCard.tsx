@@ -40,11 +40,12 @@ interface Asset {
 
 interface AssetCardProps {
   asset: Asset;
+  className?: string;
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
 }
 
-export const AssetCard = ({ asset, onEdit, onDelete }: AssetCardProps) => {
+export const AssetCard = ({ asset, className, onEdit, onDelete }: AssetCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
@@ -64,7 +65,7 @@ export const AssetCard = ({ asset, onEdit, onDelete }: AssetCardProps) => {
   };
 
   return (
-    <Card className="group hover:shadow-md transition-shadow">
+    <Card className={`group hover:shadow-md transition-shadow ${className || ''}`}>
       <CardContent className="p-0">
         {/* Image */}
         <div className="aspect-[4/3] bg-muted rounded-t-lg overflow-hidden relative">

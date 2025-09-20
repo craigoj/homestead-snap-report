@@ -14,16 +14,368 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      asset_photos: {
+        Row: {
+          asset_id: string
+          created_at: string
+          file_name: string
+          file_path: string
+          file_size: number | null
+          id: string
+          is_primary: boolean | null
+        }
+        Insert: {
+          asset_id: string
+          created_at?: string
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          is_primary?: boolean | null
+        }
+        Update: {
+          asset_id?: string
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          is_primary?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_photos_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assets: {
+        Row: {
+          brand: string | null
+          category: Database["public"]["Enums"]["asset_category"]
+          condition: Database["public"]["Enums"]["asset_condition"]
+          created_at: string
+          description: string | null
+          estimated_value: number | null
+          id: string
+          model: string | null
+          ocr_confidence: number | null
+          ocr_extracted: boolean | null
+          property_id: string
+          purchase_date: string | null
+          purchase_price: number | null
+          room_id: string | null
+          serial_number: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          brand?: string | null
+          category?: Database["public"]["Enums"]["asset_category"]
+          condition?: Database["public"]["Enums"]["asset_condition"]
+          created_at?: string
+          description?: string | null
+          estimated_value?: number | null
+          id?: string
+          model?: string | null
+          ocr_confidence?: number | null
+          ocr_extracted?: boolean | null
+          property_id: string
+          purchase_date?: string | null
+          purchase_price?: number | null
+          room_id?: string | null
+          serial_number?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          brand?: string | null
+          category?: Database["public"]["Enums"]["asset_category"]
+          condition?: Database["public"]["Enums"]["asset_condition"]
+          created_at?: string
+          description?: string | null
+          estimated_value?: number | null
+          id?: string
+          model?: string | null
+          ocr_confidence?: number | null
+          ocr_extracted?: boolean | null
+          property_id?: string
+          purchase_date?: string | null
+          purchase_price?: number | null
+          room_id?: string | null
+          serial_number?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assets_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assets_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_logs: {
+        Row: {
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          event_type: Database["public"]["Enums"]["event_type"]
+          id: string
+          metadata: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          event_type: Database["public"]["Enums"]["event_type"]
+          id?: string
+          metadata?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          event_type?: Database["public"]["Enums"]["event_type"]
+          id?: string
+          metadata?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      claim_reports: {
+        Row: {
+          asset_count: number | null
+          created_at: string
+          expires_at: string | null
+          file_path: string | null
+          id: string
+          property_id: string | null
+          report_type: string
+          share_token: string | null
+          status: Database["public"]["Enums"]["report_status"] | null
+          title: string
+          total_value: number | null
+          user_id: string
+        }
+        Insert: {
+          asset_count?: number | null
+          created_at?: string
+          expires_at?: string | null
+          file_path?: string | null
+          id?: string
+          property_id?: string | null
+          report_type?: string
+          share_token?: string | null
+          status?: Database["public"]["Enums"]["report_status"] | null
+          title: string
+          total_value?: number | null
+          user_id: string
+        }
+        Update: {
+          asset_count?: number | null
+          created_at?: string
+          expires_at?: string | null
+          file_path?: string | null
+          id?: string
+          property_id?: string | null
+          report_type?: string
+          share_token?: string | null
+          status?: Database["public"]["Enums"]["report_status"] | null
+          title?: string
+          total_value?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_reports_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          address: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      properties: {
+        Row: {
+          address: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      receipts: {
+        Row: {
+          asset_id: string
+          created_at: string
+          file_name: string
+          file_path: string
+          file_size: number | null
+          id: string
+        }
+        Insert: {
+          asset_id: string
+          created_at?: string
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+        }
+        Update: {
+          asset_id?: string
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "receipts_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rooms: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          property_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          property_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          property_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rooms_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      log_audit_event: {
+        Args: {
+          p_entity_id?: string
+          p_entity_type?: string
+          p_event_type: Database["public"]["Enums"]["event_type"]
+          p_metadata?: Json
+        }
+        Returns: string
+      }
     }
     Enums: {
-      [_ in never]: never
+      asset_category:
+        | "electronics"
+        | "furniture"
+        | "appliances"
+        | "jewelry"
+        | "clothing"
+        | "art"
+        | "books"
+        | "tools"
+        | "sports"
+        | "other"
+      asset_condition: "excellent" | "good" | "fair" | "poor"
+      event_type:
+        | "asset_created"
+        | "ocr_success"
+        | "ocr_fail"
+        | "export_generated"
+        | "user_signup"
+        | "property_created"
+      report_status: "generating" | "ready" | "expired" | "failed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +502,29 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      asset_category: [
+        "electronics",
+        "furniture",
+        "appliances",
+        "jewelry",
+        "clothing",
+        "art",
+        "books",
+        "tools",
+        "sports",
+        "other",
+      ],
+      asset_condition: ["excellent", "good", "fair", "poor"],
+      event_type: [
+        "asset_created",
+        "ocr_success",
+        "ocr_fail",
+        "export_generated",
+        "user_signup",
+        "property_created",
+      ],
+      report_status: ["generating", "ready", "expired", "failed"],
+    },
   },
 } as const

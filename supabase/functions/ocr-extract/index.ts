@@ -70,7 +70,7 @@ serve(async (req) => {
             - confidence: Your confidence level (0-100) in the extracted information
             - extracted_text: All visible text from the image
             
-            Return only valid JSON. If information is not clearly visible, omit that field or use null.`
+            Return ONLY valid JSON without any markdown formatting or code blocks. Do not wrap the response in backticks or any other formatting. If information is not clearly visible, omit that field or use null.`
           },
           {
             role: 'user',
@@ -108,12 +108,36 @@ serve(async (req) => {
 
     console.log('Raw OpenAI response:', content);
 
-    // Parse the JSON response
+    // Parse the JSON response, handling markdown-wrapped JSON
     let ocrResult: OCRResponse;
     try {
-      ocrResult = JSON.parse(content);
+      // Strip markdown code blocks if present
+      let cleanContent = content.trim();
+      
+      // Check if content is wrapped in markdown code blocks
+      const markdownJsonMatch = cleanContent.match(/```json\s*\n?([\s\S]*?)\n?\s*```/);
+      if (markdownJsonMatch) {
+        cleanContent = markdownJsonMatch[1].trim();
+        console.log('Extracted JSON from markdown blocks');
+      }
+      
+      // Also handle cases where it's just wrapped in backticks
+      if (cleanContent.startsWith('```') && cleanContent.endsWith('```')) {
+        cleanContent = cleanContent.slice(3, -3).trim();
+        if (cleanContent.startsWith('json\n')) {
+          cleanContent = cleanContent.slice(5).trim();
+        }
+        console.log('Stripped markdown formatting');
+      }
+      
+      console.log('Cleaned content for parsing:', cleanContent);
+      
+      ocrResult = JSON.parse(cleanContent);
+      console.log('Successfully parsed OCR JSON');
     } catch (parseError) {
-      console.error('Failed to parse JSON:', parseError);
+      console.error('Failed to parse JSON after cleaning:', parseError);
+      console.error('Content that failed to parse:', content);
+      
       // Fallback: extract basic information
       ocrResult = {
         title: 'Extracted Item',

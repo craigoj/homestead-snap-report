@@ -1,0 +1,224 @@
+import { useState, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { toast } from '@/hooks/use-toast';
+import { Camera, Upload, X, ImageIcon } from 'lucide-react';
+
+interface PhotoUploadProps {
+  onPhotosUploaded: (photos: string[]) => void;
+  maxPhotos?: number;
+  existingPhotos?: string[];
+}
+
+export const PhotoUpload = ({ onPhotosUploaded, maxPhotos = 5, existingPhotos = [] }: PhotoUploadProps) => {
+  const [uploadedPhotos, setUploadedPhotos] = useState<string[]>(existingPhotos);
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileSelect = useCallback(async (files: FileList) => {
+    if (uploadedPhotos.length + files.length > maxPhotos) {
+      toast({
+        title: "Too Many Photos",
+        description: `You can only upload up to ${maxPhotos} photos.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+    
+    try {
+      const newPhotos: string[] = [];
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          toast({
+            title: "Invalid File Type",
+            description: "Please select only image files.",
+            variant: "destructive",
+          });
+          continue;
+        }
+
+        // Validate file size (5MB limit)
+        if (file.size > 5 * 1024 * 1024) {
+          toast({
+            title: "File Too Large",
+            description: `${file.name} is too large. Please select files under 5MB.`,
+            variant: "destructive",
+          });
+          continue;
+        }
+
+        // Create a placeholder URL for the photo
+        // In a real implementation, this would upload to Supabase Storage
+        const photoUrl = `assets/${Date.now()}_${i}_${file.name}`;
+        newPhotos.push(photoUrl);
+      }
+
+      const updatedPhotos = [...uploadedPhotos, ...newPhotos];
+      setUploadedPhotos(updatedPhotos);
+      onPhotosUploaded(updatedPhotos);
+
+      toast({
+        title: "Photos Uploaded",
+        description: `${newPhotos.length} photo(s) uploaded successfully.`,
+      });
+      
+    } catch (error: any) {
+      toast({
+        title: "Upload Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  }, [uploadedPhotos, maxPhotos, onPhotosUploaded]);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleFileSelect(files);
+    }
+  }, [handleFileSelect]);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+  }, []);
+
+  const removePhoto = (index: number) => {
+    const updatedPhotos = uploadedPhotos.filter((_, i) => i !== index);
+    setUploadedPhotos(updatedPhotos);
+    onPhotosUploaded(updatedPhotos);
+  };
+
+  const triggerCamera = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.capture = 'environment'; // Use rear camera on mobile
+    input.multiple = maxPhotos > 1;
+    input.onchange = (e) => {
+      const files = (e.target as HTMLInputElement).files;
+      if (files) {
+        handleFileSelect(files);
+      }
+    };
+    input.click();
+  };
+
+  const triggerFileSelect = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.multiple = maxPhotos > 1;
+    input.onchange = (e) => {
+      const files = (e.target as HTMLInputElement).files;
+      if (files) {
+        handleFileSelect(files);
+      }
+    };
+    input.click();
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Upload Area */}
+      <Card
+        className="border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors cursor-pointer"
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onClick={triggerFileSelect}
+      >
+        <div className="p-8 text-center">
+          <div className="flex justify-center mb-4">
+            <div className="p-3 bg-muted rounded-full">
+              <ImageIcon className="h-8 w-8 text-muted-foreground" />
+            </div>
+          </div>
+          <h3 className="text-lg font-medium mb-2">Upload Photos</h3>
+          <p className="text-muted-foreground mb-4">
+            Drag and drop images here, or click to select files
+          </p>
+          <div className="flex justify-center space-x-2">
+            <Button type="button" variant="outline" onClick={(e) => {
+              e.stopPropagation();
+              triggerCamera();
+            }}>
+              <Camera className="mr-2 h-4 w-4" />
+              Take Photo
+            </Button>
+            <Button type="button" variant="outline" onClick={(e) => {
+              e.stopPropagation();
+              triggerFileSelect();
+            }}>
+              <Upload className="mr-2 h-4 w-4" />
+              Choose Files
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-4">
+            Maximum {maxPhotos} photos • Up to 5MB each • JPG, PNG, WebP
+          </p>
+        </div>
+      </Card>
+
+      {/* Photo Previews */}
+      {uploadedPhotos.length > 0 && (
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {uploadedPhotos.map((photo, index) => (
+            <Card key={index} className="relative group">
+              <div className="aspect-square bg-muted rounded-lg overflow-hidden">
+                <div className="w-full h-full flex items-center justify-center">
+                  <ImageIcon className="h-12 w-12 text-muted-foreground" />
+                </div>
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => removePhoto(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              {index === 0 && (
+                <div className="absolute top-2 left-2">
+                  <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded">
+                    Primary
+                  </span>
+                </div>
+              )}
+            </Card>
+          ))}
+          
+          {/* Add More Button */}
+          {uploadedPhotos.length < maxPhotos && (
+            <Card 
+              className="aspect-square border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors cursor-pointer"
+              onClick={triggerFileSelect}
+            >
+              <div className="w-full h-full flex flex-col items-center justify-center">
+                <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                <span className="text-sm text-muted-foreground">Add More</span>
+              </div>
+            </Card>
+          )}
+        </div>
+      )}
+
+      {uploading && (
+        <div className="text-center py-4">
+          <div className="inline-flex items-center space-x-2 text-sm text-muted-foreground">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+            <span>Uploading photos...</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

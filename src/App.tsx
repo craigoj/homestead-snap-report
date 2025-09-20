@@ -9,6 +9,10 @@ import { Layout } from "@/components/Layout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import Properties from "./pages/Properties";
+import AddAsset from "./pages/AddAsset";
+import AssetDetail from "./pages/AssetDetail";
+import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +31,34 @@ const App = () => (
               <ProtectedRoute>
                 <Layout>
                   <Dashboard />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/properties" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Properties />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/assets/add" element={
+              <ProtectedRoute>
+                <Layout>
+                  <AddAsset />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/assets/:id" element={
+              <ProtectedRoute>
+                <Layout>
+                  <AssetDetail />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/reports" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Reports />
                 </Layout>
               </ProtectedRoute>
             } />

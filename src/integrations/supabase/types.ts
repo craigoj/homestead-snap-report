@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      api_cache: {
+        Row: {
+          cache_key: string
+          created_at: string | null
+          expires_at: string
+          id: string
+          response_data: Json
+        }
+        Insert: {
+          cache_key: string
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          response_data: Json
+        }
+        Update: {
+          cache_key?: string
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          response_data?: Json
+        }
+        Relationships: []
+      }
+      api_rate_limits: {
+        Row: {
+          created_at: string | null
+          endpoint: string
+          id: string
+          request_count: number | null
+          user_id: string | null
+          window_start: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          request_count?: number | null
+          user_id?: string | null
+          window_start?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          request_count?: number | null
+          user_id?: string | null
+          window_start?: string | null
+        }
+        Relationships: []
+      }
       asset_photos: {
         Row: {
           asset_id: string
@@ -281,32 +332,41 @@ export type Database = {
       }
       error_logs: {
         Row: {
+          correlation_id: string | null
           created_at: string
+          endpoint: string | null
           error_context: Json | null
           error_message: string | null
           error_type: string
           id: string
           resolved_at: string | null
+          response_time_ms: number | null
           retry_count: number | null
           user_id: string | null
         }
         Insert: {
+          correlation_id?: string | null
           created_at?: string
+          endpoint?: string | null
           error_context?: Json | null
           error_message?: string | null
           error_type: string
           id?: string
           resolved_at?: string | null
+          response_time_ms?: number | null
           retry_count?: number | null
           user_id?: string | null
         }
         Update: {
+          correlation_id?: string | null
           created_at?: string
+          endpoint?: string | null
           error_context?: Json | null
           error_message?: string | null
           error_type?: string
           id?: string
           resolved_at?: string | null
+          response_time_ms?: number | null
           retry_count?: number | null
           user_id?: string | null
         }

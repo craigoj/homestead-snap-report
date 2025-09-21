@@ -44,7 +44,7 @@ export const SolutionSection = () => {
   ];
 
   return (
-    <section id="how-it-works" className="py-20 bg-gradient-hero relative overflow-hidden">
+    <section id="solution" className="py-20 bg-gradient-hero relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0">
         <div className="absolute top-20 right-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-float" />

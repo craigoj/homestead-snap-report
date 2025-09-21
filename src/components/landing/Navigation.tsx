@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Shield } from 'lucide-react';
+import { Menu, X, Shield, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 
 export const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showDemoModal, setShowDemoModal] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,7 +19,7 @@ export const Navigation = () => {
 
   const navItems = [
     { label: 'Features', href: '#features' },
-    { label: 'How it Works', href: '#how-it-works' },
+    { label: 'How it Works', href: '#solution' },
     { label: 'Pricing', href: '#pricing' },
     { label: 'Testimonials', href: '#testimonials' },
   ];
@@ -64,10 +66,17 @@ export const Navigation = () => {
 
             {/* CTA Buttons */}
             <div className="hidden md:flex items-center space-x-4">
-              <Button variant="ghost" className="animate-underline">
+              <Button 
+                variant="ghost" 
+                className="animate-underline"
+                onClick={() => window.location.href = '/auth'}
+              >
                 Sign In
               </Button>
-              <Button className="btn-premium rounded-full px-6">
+              <Button 
+                className="btn-premium rounded-full px-6"
+                onClick={() => window.location.href = '/auth'}
+              >
                 Start Free Trial
               </Button>
             </div>
@@ -102,10 +111,17 @@ export const Navigation = () => {
                 </a>
               ))}
               <div className="mt-8 space-y-4">
-                <Button variant="ghost" className="w-full justify-start">
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start"
+                  onClick={() => { setIsMobileMenuOpen(false); window.location.href = '/auth'; }}
+                >
                   Sign In
                 </Button>
-                <Button className="w-full btn-premium">
+                <Button 
+                  className="w-full btn-premium"
+                  onClick={() => { setIsMobileMenuOpen(false); window.location.href = '/auth'; }}
+                >
                   Start Free Trial
                 </Button>
               </div>

@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, CheckCircle, Star, Users, DollarSign, Clock } from 'lucide-react';
+import { ArrowRight, CheckCircle, Star, Users, DollarSign, Clock, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { DemoModal } from './DemoModal';
 
 export const HeroSection = () => {
   const [currentText, setCurrentText] = useState('');
   const [textIndex, setTextIndex] = useState(0);
+  const [showDemoModal, setShowDemoModal] = useState(false);
+  const [email, setEmail] = useState('');
   const fullText = "Never Lose Money on Insurance Claims Again";
 
   // Typewriter effect
@@ -117,8 +120,18 @@ export const HeroSection = () => {
                     type="email"
                     placeholder="Enter your email address"
                     className="flex-1 h-12 border-2 border-border focus:border-primary rounded-xl"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
-                  <Button className="btn-premium h-12 px-8 rounded-xl group">
+                  <Button 
+                    className="btn-premium h-12 px-8 rounded-xl group"
+                    onClick={() => {
+                      if (email) {
+                        localStorage.setItem('homeguard-email', email);
+                      }
+                      window.location.href = '/auth';
+                    }}
+                  >
                     Start Free Trial
                     <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                   </Button>
@@ -142,7 +155,11 @@ export const HeroSection = () => {
 
             {/* Secondary CTA */}
             <div className="animate-fade-in-up stagger-5">
-              <Button variant="ghost" className="text-primary hover:text-primary-glow animate-underline">
+              <Button 
+                variant="ghost" 
+                className="text-primary hover:text-primary-glow animate-underline"
+                onClick={() => setShowDemoModal(true)}
+              >
                 Watch 2-minute demo
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -228,6 +245,12 @@ export const HeroSection = () => {
           </div>
         </div>
       </div>
+
+      {/* Demo Modal */}
+      <DemoModal 
+        isOpen={showDemoModal} 
+        onClose={() => setShowDemoModal(false)} 
+      />
     </section>
   );
 };

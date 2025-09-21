@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertTriangle, FileX, Clock, DollarSign } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export const ProblemSection = () => {
   const problems = [
@@ -104,9 +105,16 @@ export const ProblemSection = () => {
             <div className="text-4xl font-bold text-warning mb-2">
               $15,000+
             </div>
-            <div className="text-lg text-gray-300">
+            <div className="text-lg text-gray-300 mb-6">
               Average amount our users recover that would have been lost
             </div>
+            <Button 
+              size="lg" 
+              className="btn-warning px-8 py-4 text-lg font-semibold"
+              onClick={() => window.location.href = '/auth'}
+            >
+              Get Started - Save Money Today
+            </Button>
           </div>
         </div>
       </div>

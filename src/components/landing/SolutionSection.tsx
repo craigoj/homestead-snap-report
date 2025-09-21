@@ -184,7 +184,10 @@ export const SolutionSection = () => {
 
         {/* CTA */}
         <div className="text-center mt-12">
-          <Button className="btn-premium text-lg px-8 py-4 rounded-full group">
+          <Button 
+            className="btn-premium text-lg px-8 py-4 rounded-full group"
+            onClick={() => window.location.href = '/auth'}
+          >
             Start Your Free Trial Today
             <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
           </Button>

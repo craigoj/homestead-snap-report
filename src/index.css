@@ -268,3 +268,25 @@ All colors MUST be HSL.
   .stagger-4 { animation-delay: 0.4s; }
   .stagger-5 { animation-delay: 0.5s; }
 }
+
+/* Performance optimizations for animations */
+.animate-float,
+.animate-fade-in,
+.animate-fade-in-up,
+.animate-slide-in-right,
+.pulse-glow,
+.glass-card {
+  will-change: transform, opacity;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

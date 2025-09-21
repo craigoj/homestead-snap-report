@@ -1,0 +1,16 @@
+{
+  "name": "HomeGuard - AI-Powered Home Inventory",
+  "short_name": "HomeGuard",
+  "description": "AI-powered home inventory for insurance claims",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0F172A",
+  "theme_color": "#2563EB",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

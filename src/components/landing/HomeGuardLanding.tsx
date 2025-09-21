@@ -3,9 +3,7 @@ import { Navigation } from './Navigation';
 import { HeroSection } from './HeroSection';
 import { ProblemSection } from './ProblemSection';
 import { SolutionSection } from './SolutionSection';
-import { FeaturesSection } from './FeaturesSection';
-import { PricingSection } from './PricingSection';
-import { TestimonialsSection } from './TestimonialsSection';
+import { LazyFeaturesSection, LazyPricingSection, LazyTestimonialsSection } from './LazyComponents';
 import { Footer } from './Footer';
 
 export const HomeGuardLanding = () => {
@@ -16,9 +14,9 @@ export const HomeGuardLanding = () => {
         <HeroSection />
         <ProblemSection />
         <SolutionSection />
-        <FeaturesSection />
-        <TestimonialsSection />
-        <PricingSection />
+        <LazyFeaturesSection />
+        <LazyTestimonialsSection />
+        <LazyPricingSection />
       </main>
       <Footer />
     </div>

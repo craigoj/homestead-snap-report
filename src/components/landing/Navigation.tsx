@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Menu, X, Shield, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { useAuth } from '@/hooks/useAuth';
 
 export const Navigation = () => {
+  const { user, loading } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showDemoModal, setShowDemoModal] = useState(false);
@@ -66,19 +68,32 @@ export const Navigation = () => {
 
             {/* CTA Buttons */}
             <div className="hidden md:flex items-center space-x-4">
-              <Button 
-                variant="ghost" 
-                className="animate-underline"
-                onClick={() => window.location.href = '/auth'}
-              >
-                Sign In
-              </Button>
-              <Button 
-                className="btn-premium rounded-full px-6"
-                onClick={() => window.location.href = '/auth'}
-              >
-                Start Free Trial
-              </Button>
+              {!loading && (
+                user ? (
+                  <Button 
+                    className="btn-premium rounded-full px-6"
+                    onClick={() => window.location.href = '/dashboard'}
+                  >
+                    Go to Dashboard
+                  </Button>
+                ) : (
+                  <>
+                    <Button 
+                      variant="ghost" 
+                      className="animate-underline"
+                      onClick={() => window.location.href = '/auth'}
+                    >
+                      Sign In
+                    </Button>
+                    <Button 
+                      className="btn-premium rounded-full px-6"
+                      onClick={() => window.location.href = '/auth'}
+                    >
+                      Start Free Trial
+                    </Button>
+                  </>
+                )
+              )}
             </div>
 
             {/* Mobile menu button */}
@@ -111,19 +126,32 @@ export const Navigation = () => {
                 </a>
               ))}
               <div className="mt-8 space-y-4">
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start"
-                  onClick={() => { setIsMobileMenuOpen(false); window.location.href = '/auth'; }}
-                >
-                  Sign In
-                </Button>
-                <Button 
-                  className="w-full btn-premium"
-                  onClick={() => { setIsMobileMenuOpen(false); window.location.href = '/auth'; }}
-                >
-                  Start Free Trial
-                </Button>
+                {!loading && (
+                  user ? (
+                    <Button 
+                      className="w-full btn-premium"
+                      onClick={() => { setIsMobileMenuOpen(false); window.location.href = '/dashboard'; }}
+                    >
+                      Go to Dashboard
+                    </Button>
+                  ) : (
+                    <>
+                      <Button 
+                        variant="ghost" 
+                        className="w-full justify-start"
+                        onClick={() => { setIsMobileMenuOpen(false); window.location.href = '/auth'; }}
+                      >
+                        Sign In
+                      </Button>
+                      <Button 
+                        className="w-full btn-premium"
+                        onClick={() => { setIsMobileMenuOpen(false); window.location.href = '/auth'; }}
+                      >
+                        Start Free Trial
+                      </Button>
+                    </>
+                  )
+                )}
               </div>
             </div>
           </div>

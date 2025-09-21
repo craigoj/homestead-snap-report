@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, CheckCircle, Star, Users, DollarSign, Clock, Play } from 'lucide-react';
+import { ArrowRight, CheckCircle, Star, Users, DollarSign, Clock, Play, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DemoModal } from './DemoModal';
@@ -9,6 +9,7 @@ export const HeroSection = () => {
   const [textIndex, setTextIndex] = useState(0);
   const [showDemoModal, setShowDemoModal] = useState(false);
   const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const fullText = "Never Lose Money on Insurance Claims Again";
 
   // Typewriter effect
@@ -125,15 +126,28 @@ export const HeroSection = () => {
                   />
                   <Button 
                     className="btn-premium h-12 px-8 rounded-xl group"
-                    onClick={() => {
+                    disabled={isSubmitting}
+                    onClick={async () => {
+                      setIsSubmitting(true);
                       if (email) {
                         localStorage.setItem('homeguard-email', email);
                       }
+                      // Add slight delay for better UX
+                      await new Promise(resolve => setTimeout(resolve, 500));
                       window.location.href = '/auth';
                     }}
                   >
-                    Start Free Trial
-                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Getting Started...
+                      </>
+                    ) : (
+                      <>
+                        Start Free Trial
+                        <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                      </>
+                    )}
                   </Button>
                 </div>
                 <div className="flex items-center space-x-4 mt-4 text-sm text-muted-foreground">

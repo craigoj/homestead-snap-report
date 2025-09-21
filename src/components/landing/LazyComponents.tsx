@@ -2,9 +2,23 @@ import React, { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // Lazy load heavy components for better performance
-const FeaturesSection = React.lazy(() => import('./FeaturesSection').then(module => ({ default: module.FeaturesSection })));
-const PricingSection = React.lazy(() => import('./PricingSection').then(module => ({ default: module.PricingSection })));
-const TestimonialsSection = React.lazy(() => import('./TestimonialsSection').then(module => ({ default: module.TestimonialsSection })));
+const LazyFeaturesSection = React.lazy(() => 
+  import('./FeaturesSection').then(module => ({ 
+    default: module.FeaturesSection 
+  }))
+);
+
+const LazyPricingSection = React.lazy(() => 
+  import('./PricingSection').then(module => ({ 
+    default: module.PricingSection 
+  }))
+);
+
+const LazyTestimonialsSection = React.lazy(() => 
+  import('./TestimonialsSection').then(module => ({ 
+    default: module.TestimonialsSection 
+  }))
+);
 
 // Loading skeletons for each section
 const FeaturesSkeleton = () => (
@@ -79,21 +93,21 @@ const TestimonialsSkeleton = () => (
   </div>
 );
 
-// Wrapper components with Suspense
-export const LazyFeaturesSection = () => (
+// Export wrapper components with Suspense
+export const LazyFeaturesWrapper = () => (
   <Suspense fallback={<FeaturesSkeleton />}>
-    <FeaturesSection />
+    <LazyFeaturesSection />
   </Suspense>
 );
 
-export const LazyPricingSection = () => (
+export const LazyPricingWrapper = () => (
   <Suspense fallback={<PricingSkeleton />}>
-    <PricingSection />
+    <LazyPricingSection />
   </Suspense>
 );
 
-export const LazyTestimonialsSection = () => (
+export const LazyTestimonialsWrapper = () => (
   <Suspense fallback={<TestimonialsSkeleton />}>
-    <TestimonialsSection />
+    <LazyTestimonialsSection />
   </Suspense>
 );

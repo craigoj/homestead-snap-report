@@ -54,11 +54,14 @@ export type Database = {
       }
       assets: {
         Row: {
+          barcode_data: string | null
           brand: string | null
           category: Database["public"]["Enums"]["asset_category"]
           condition: Database["public"]["Enums"]["asset_condition"]
           created_at: string
           description: string | null
+          device_specifications: Json | null
+          equipment_type: Json | null
           estimated_value: number | null
           id: string
           model: string | null
@@ -70,6 +73,7 @@ export type Database = {
           property_id: string
           purchase_date: string | null
           purchase_price: number | null
+          qr_code_data: string | null
           room_id: string | null
           serial_number: string | null
           title: string
@@ -77,11 +81,14 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          barcode_data?: string | null
           brand?: string | null
           category?: Database["public"]["Enums"]["asset_category"]
           condition?: Database["public"]["Enums"]["asset_condition"]
           created_at?: string
           description?: string | null
+          device_specifications?: Json | null
+          equipment_type?: Json | null
           estimated_value?: number | null
           id?: string
           model?: string | null
@@ -93,6 +100,7 @@ export type Database = {
           property_id: string
           purchase_date?: string | null
           purchase_price?: number | null
+          qr_code_data?: string | null
           room_id?: string | null
           serial_number?: string | null
           title: string
@@ -100,11 +108,14 @@ export type Database = {
           user_id: string
         }
         Update: {
+          barcode_data?: string | null
           brand?: string | null
           category?: Database["public"]["Enums"]["asset_category"]
           condition?: Database["public"]["Enums"]["asset_condition"]
           created_at?: string
           description?: string | null
+          device_specifications?: Json | null
+          equipment_type?: Json | null
           estimated_value?: number | null
           id?: string
           model?: string | null
@@ -116,6 +127,7 @@ export type Database = {
           property_id?: string
           purchase_date?: string | null
           purchase_price?: number | null
+          qr_code_data?: string | null
           room_id?: string | null
           serial_number?: string | null
           title?: string
@@ -221,6 +233,84 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      equipment_templates: {
+        Row: {
+          brand_patterns: string[] | null
+          category: string
+          common_models: string[] | null
+          created_at: string
+          depreciation_rate: number | null
+          equipment_name: string
+          id: string
+          ocr_hints: Json | null
+          serial_number_patterns: string[] | null
+          subcategory: string | null
+          typical_value_range: unknown | null
+          updated_at: string
+        }
+        Insert: {
+          brand_patterns?: string[] | null
+          category: string
+          common_models?: string[] | null
+          created_at?: string
+          depreciation_rate?: number | null
+          equipment_name: string
+          id?: string
+          ocr_hints?: Json | null
+          serial_number_patterns?: string[] | null
+          subcategory?: string | null
+          typical_value_range?: unknown | null
+          updated_at?: string
+        }
+        Update: {
+          brand_patterns?: string[] | null
+          category?: string
+          common_models?: string[] | null
+          created_at?: string
+          depreciation_rate?: number | null
+          equipment_name?: string
+          id?: string
+          ocr_hints?: Json | null
+          serial_number_patterns?: string[] | null
+          subcategory?: string | null
+          typical_value_range?: unknown | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      error_logs: {
+        Row: {
+          created_at: string
+          error_context: Json | null
+          error_message: string | null
+          error_type: string
+          id: string
+          resolved_at: string | null
+          retry_count: number | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_context?: Json | null
+          error_message?: string | null
+          error_type: string
+          id?: string
+          resolved_at?: string | null
+          retry_count?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_context?: Json | null
+          error_message?: string | null
+          error_type?: string
+          id?: string
+          resolved_at?: string | null
+          retry_count?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       profiles: {
         Row: {

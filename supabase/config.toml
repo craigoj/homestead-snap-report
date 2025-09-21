@@ -1,13 +1,34 @@
 project_id = "hfiznpxdopjdwtuenxqf"
 
-[functions.ocr-extract]
-verify_jwt = true
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
 
-[functions.ocr-enhanced-extract]
-verify_jwt = true
-
-[functions.valuation-estimate]
-verify_jwt = true
+[auth]
+enabled = true
+port = 54324
+site_url = "http://127.0.0.1:3000"
+additional_redirect_urls = ["https://hfiznpxdopjdwtuenxqf.supabase.co"]
+jwt_expiry = 3600
+enable_signup = true
+enable_email_confirmations = false
+enable_sms_confirmations = false
+enable_phone_confirmations = false
 
 [functions.generate-report]
-verify_jwt = true
+verify_jwt = false
+
+[functions.ocr-extract]
+verify_jwt = false
+
+[functions.valuation-estimate]
+verify_jwt = false
+
+[functions.ocr-enhanced-extract]
+verify_jwt = false
+
+[functions.product-lookup]
+verify_jwt = false

@@ -64,6 +64,9 @@ export type Database = {
           model: string | null
           ocr_confidence: number | null
           ocr_extracted: boolean | null
+          ocr_metadata: Json | null
+          ocr_provider: string | null
+          ocr_raw_text: string | null
           property_id: string
           purchase_date: string | null
           purchase_price: number | null
@@ -84,6 +87,9 @@ export type Database = {
           model?: string | null
           ocr_confidence?: number | null
           ocr_extracted?: boolean | null
+          ocr_metadata?: Json | null
+          ocr_provider?: string | null
+          ocr_raw_text?: string | null
           property_id: string
           purchase_date?: string | null
           purchase_price?: number | null
@@ -104,6 +110,9 @@ export type Database = {
           model?: string | null
           ocr_confidence?: number | null
           ocr_extracted?: boolean | null
+          ocr_metadata?: Json | null
+          ocr_provider?: string | null
+          ocr_raw_text?: string | null
           property_id?: string
           purchase_date?: string | null
           purchase_price?: number | null

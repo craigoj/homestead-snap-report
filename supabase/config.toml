@@ -3,6 +3,9 @@ project_id = "hfiznpxdopjdwtuenxqf"
 [functions.ocr-extract]
 verify_jwt = true
 
+[functions.ocr-enhanced-extract]
+verify_jwt = true
+
 [functions.valuation-estimate]
 verify_jwt = true
 

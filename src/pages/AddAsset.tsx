@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PhotoUpload } from '@/components/PhotoUpload';
 import { PropertyRoomSelector } from '@/components/PropertyRoomSelector';
+import { OCRReviewModal } from '@/components/OCRReviewModal';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
@@ -20,7 +21,9 @@ import {
   Zap,
   AlertCircle,
   Brain,
-  TrendingUp
+  TrendingUp,
+  CheckCircle,
+  Edit
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -54,6 +57,9 @@ export default function AddAsset() {
   const [valuationLoading, setValuationLoading] = useState(false);
   const [valuationResult, setValuationResult] = useState<any>(null);
   const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([]);
+  const [ocrResult, setOcrResult] = useState<any>(null);
+  const [showOCRReview, setShowOCRReview] = useState(false);
+  const [ocrImageUrl, setOcrImageUrl] = useState<string>('');
   const [formData, setFormData] = useState<AssetForm>({
     title: '',
     description: '',
@@ -81,15 +87,17 @@ export default function AddAsset() {
   const performOCR = async (photoPath: string) => {
     setOcrLoading(true);
     try {
-      console.log('Processing OCR for:', photoPath);
+      console.log('Processing enhanced OCR for:', photoPath);
 
       // Get the full URL for the image
       const { data: { publicUrl } } = supabase.storage
         .from('asset-photos')
         .getPublicUrl(photoPath);
 
-      // Call the OCR edge function
-      const { data: ocrResult, error: ocrError } = await supabase.functions.invoke('ocr-extract', {
+      setOcrImageUrl(publicUrl);
+
+      // Call the enhanced OCR edge function
+      const { data: enhancedResult, error: ocrError } = await supabase.functions.invoke('ocr-enhanced-extract', {
         body: { imageUrl: publicUrl }
       });
 
@@ -97,41 +105,42 @@ export default function AddAsset() {
         throw new Error(ocrError.message);
       }
 
-      if (!ocrResult) {
+      if (!enhancedResult) {
         throw new Error('No OCR result returned');
       }
 
-      console.log('OCR Result:', ocrResult);
+      console.log('Enhanced OCR Result:', enhancedResult);
+      setOcrResult(enhancedResult);
 
-      // Update form with OCR results
-      setFormData(prev => ({
-        ...prev,
-        title: ocrResult.title || prev.title,
-        description: ocrResult.description || prev.description,
-        brand: ocrResult.brand || prev.brand,
-        model: ocrResult.model || prev.model,
-        serial_number: ocrResult.serial_number || prev.serial_number,
-        category: ocrResult.category || prev.category,
-        estimated_value: ocrResult.estimated_value?.toString() || prev.estimated_value,
-      }));
-
-      toast({
-        title: "OCR Complete",
-        description: `Information extracted with ${ocrResult.confidence}% confidence. Please review and edit as needed.`,
-      });
+      // Auto-apply results if confidence is high (80% or above)
+      if (enhancedResult.confidence >= 80) {
+        applyOCRResult(enhancedResult);
+        toast({
+          title: "OCR Complete",
+          description: `Information extracted with ${enhancedResult.confidence}% confidence and auto-applied.`,
+        });
+      } else {
+        // Show review modal for lower confidence results
+        setShowOCRReview(true);
+        toast({
+          title: "OCR Review Required",
+          description: `Extraction completed with ${enhancedResult.confidence}% confidence. Please review the results.`,
+        });
+      }
 
       // Log OCR success
       await supabase.rpc('log_audit_event', {
         p_event_type: 'ocr_success',
         p_entity_type: 'asset',
         p_metadata: { 
-          confidence: ocrResult.confidence, 
-          extracted_text: ocrResult.extracted_text 
+          confidence: enhancedResult.confidence, 
+          provider: enhancedResult.provider,
+          extracted_text: enhancedResult.extracted_text 
         }
       });
 
     } catch (error: any) {
-      console.error('OCR processing failed:', error);
+      console.error('Enhanced OCR processing failed:', error);
       
       toast({
         title: "OCR Failed",
@@ -147,6 +156,42 @@ export default function AddAsset() {
       });
     } finally {
       setOcrLoading(false);
+    }
+  };
+
+  const applyOCRResult = (result: any) => {
+    setFormData(prev => ({
+      ...prev,
+      title: result.title || prev.title,
+      description: result.description || prev.description,
+      brand: result.brand || prev.brand,
+      model: result.model || prev.model,
+      serial_number: result.serial_number || prev.serial_number,
+      category: result.category || prev.category,
+      estimated_value: result.estimated_value?.toString() || prev.estimated_value,
+    }));
+  };
+
+  const handleOCRAccept = (correctedResult: any) => {
+    applyOCRResult(correctedResult);
+    setOcrResult(correctedResult);
+    toast({
+      title: "OCR Results Applied",
+      description: "The extracted information has been applied to the form.",
+    });
+  };
+
+  const handleOCRReject = () => {
+    setOcrResult(null);
+    toast({
+      title: "OCR Results Rejected",
+      description: "You can enter the information manually.",
+    });
+  };
+
+  const retryOCR = () => {
+    if (uploadedPhotos.length > 0) {
+      performOCR(uploadedPhotos[0]);
     }
   };
 
@@ -265,8 +310,11 @@ export default function AddAsset() {
           purchase_price: formData.purchase_price ? parseFloat(formData.purchase_price) : null,
           property_id: formData.property_id,
           room_id: formData.room_id || null,
-          ocr_extracted: uploadedPhotos.length > 0,
-          ocr_confidence: uploadedPhotos.length > 0 ? 0.85 : null,
+          ocr_extracted: uploadedPhotos.length > 0 && ocrResult !== null,
+          ocr_confidence: ocrResult?.confidence || null,
+          ocr_provider: ocrResult?.provider || null,
+          ocr_raw_text: ocrResult?.raw_text || null,
+          ocr_metadata: ocrResult?.metadata || null,
         }])
         .select()
         .single();
@@ -353,7 +401,54 @@ export default function AddAsset() {
                 <div className="mt-4 p-4 bg-muted rounded-lg">
                   <div className="flex items-center space-x-2 text-sm">
                     <Zap className="h-4 w-4 animate-pulse text-primary" />
-                    <span>Extracting details from photo...</span>
+                    <span>Extracting details from photo using enhanced OCR...</span>
+                  </div>
+                </div>
+              )}
+              
+              {ocrResult && !ocrLoading && (
+                <div className="mt-4 p-4 bg-muted rounded-lg space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <span className="font-medium text-sm">OCR Extraction Complete</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xs text-muted-foreground">
+                        {ocrResult.confidence}% confidence • {ocrResult.provider} provider
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowOCRReview(true)}
+                        className="h-6 px-2"
+                      >
+                        <Edit className="h-3 w-3 mr-1" />
+                        Review
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="text-muted-foreground">Text Quality:</span>
+                      <span className="ml-1 font-medium">
+                        {ocrResult.metadata?.text_confidence || ocrResult.confidence}%
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Structure Quality:</span>
+                      <span className="ml-1 font-medium">
+                        {ocrResult.metadata?.structure_confidence || ocrResult.confidence}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline" onClick={retryOCR} disabled={ocrLoading}>
+                      Retry OCR
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => setShowOCRReview(true)}>
+                      Review & Edit
+                    </Button>
                   </div>
                 </div>
               )}
@@ -598,6 +693,18 @@ export default function AddAsset() {
           </Button>
         </div>
       </form>
+
+      {/* OCR Review Modal */}
+      {ocrResult && (
+        <OCRReviewModal
+          isOpen={showOCRReview}
+          onClose={() => setShowOCRReview(false)}
+          ocrResult={ocrResult}
+          imageUrl={ocrImageUrl}
+          onAccept={handleOCRAccept}
+          onReject={handleOCRReject}
+        />
+      )}
     </div>
   );
 }

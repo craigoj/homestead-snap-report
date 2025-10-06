@@ -27,8 +27,33 @@ export default defineConfig(({ mode }) => ({
             lastmod: new Date().toISOString().split('T')[0],
             changefreq: 'monthly',
             priority: 0.8
+          },
+          {
+            loc: '/how-to',
+            lastmod: new Date().toISOString().split('T')[0],
+            changefreq: 'monthly',
+            priority: 0.9
+          },
+          {
+            loc: '/dashboard',
+            lastmod: new Date().toISOString().split('T')[0],
+            changefreq: 'daily',
+            priority: 0.6
+          },
+          {
+            loc: '/properties',
+            lastmod: new Date().toISOString().split('T')[0],
+            changefreq: 'daily',
+            priority: 0.6
+          },
+          {
+            loc: '/reports',
+            lastmod: new Date().toISOString().split('T')[0],
+            changefreq: 'weekly',
+            priority: 0.5
           }
-        ]
+        ],
+        prerenderRoutes: ['/', '/auth', '/how-to']
       }
     })
   ].filter(Boolean),

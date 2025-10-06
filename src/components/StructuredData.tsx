@@ -84,3 +84,34 @@ export const ReviewStructuredData: React.FC<{
 
   return <StructuredData data={JSON.stringify(reviewData)} />;
 };
+
+// HowTo structured data for guides
+export const HowToStructuredData: React.FC<{
+  name: string;
+  description: string;
+  totalTime?: string;
+  steps: Array<{
+    name: string;
+    text: string;
+    image?: string;
+    url?: string;
+  }>;
+}> = ({ name, description, totalTime, steps }) => {
+  const howToData = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name,
+    description,
+    totalTime,
+    step: steps.map((step, index) => ({
+      '@type': 'HowToStep',
+      position: index + 1,
+      name: step.name,
+      text: step.text,
+      image: step.image,
+      url: step.url
+    }))
+  };
+
+  return <StructuredData data={JSON.stringify(howToData)} />;
+};

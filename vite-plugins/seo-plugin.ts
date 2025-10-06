@@ -10,6 +10,7 @@ export interface SEOPluginOptions {
       priority?: number;
     }>;
     filename?: string;
+    prerenderRoutes?: string[];
   };
   robotsTxt?: {
     content?: string;
@@ -21,9 +22,16 @@ export interface SEOPluginOptions {
 }
 
 export default function seoPlugin(options: SEOPluginOptions = {}): Plugin {
+  let outDir: string;
+  
   return {
     name: 'vite-seo-plugin',
     apply: 'build',
+    
+    configResolved(config) {
+      outDir = config.build.outDir;
+    },
+    
     generateBundle() {
       // Generate sitemap.xml
       if (options.sitemap !== undefined) {
@@ -48,6 +56,36 @@ export default function seoPlugin(options: SEOPluginOptions = {}): Plugin {
           fileName: filename,
           source: content
         });
+      }
+    },
+    
+    async closeBundle() {
+      // Prerender static routes for SEO
+      const prerenderRoutes = options.sitemap?.prerenderRoutes || options.prerender?.routes || [];
+      
+      if (prerenderRoutes.length > 0) {
+        try {
+          const fs = await import('fs');
+          const path = await import('path');
+          const distPath = path.resolve(process.cwd(), outDir);
+          const indexHtml = fs.readFileSync(path.join(distPath, 'index.html'), 'utf-8');
+          
+          for (const route of prerenderRoutes) {
+            if (route !== '/') {
+              const routeDir = path.join(distPath, route.slice(1));
+              fs.mkdirSync(routeDir, { recursive: true });
+              fs.writeFileSync(
+                path.join(routeDir, 'index.html'),
+                indexHtml,
+                'utf-8'
+              );
+            }
+          }
+          
+          console.log(`✓ Prerendered ${prerenderRoutes.length} static routes for SEO crawlers`);
+        } catch (error) {
+          console.warn('⚠ Prerender warning:', error instanceof Error ? error.message : 'Unknown error');
+        }
       }
     },
     

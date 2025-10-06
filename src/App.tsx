@@ -18,6 +18,7 @@ import AssetDetail from "./pages/AssetDetail";
 import EditAsset from "./pages/EditAsset";
 import Reports from "./pages/Reports";
 import BulkAssetOperations from "./pages/BulkAssetOperations";
+import HowToGuide from "./pages/HowToGuide";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/how-to" element={<HowToGuide />} />
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
                     <Layout>

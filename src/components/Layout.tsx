@@ -1,10 +1,13 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
-import { Home, Shield, Package, Plus, FileText, Settings, LogOut, Menu, Database } from 'lucide-react';
+import { Home, Shield, Package, Plus, FileText, Settings, LogOut, Menu, Database, UserCog, BarChart3, Users } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/integrations/supabase/client';
+import { Separator } from '@/components/ui/separator';
 
 interface LayoutProps {
   children: ReactNode;
@@ -18,9 +21,40 @@ const navigation = [
   { name: 'Bulk Operations', href: '/bulk-operations', icon: Database },
 ];
 
+const adminNavigation = [
+  { name: 'Admin Dashboard', href: '/admin', icon: UserCog },
+  { name: 'Assessments', href: '/admin/assessments', icon: BarChart3 },
+  { name: 'Waitlist', href: '/admin/waitlist', icon: Users },
+];
+
 export const Layout = ({ children }: LayoutProps) => {
   const { user, signOut } = useAuth();
   const location = useLocation();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase.rpc('has_role', {
+          _user_id: user.id,
+          _role: 'admin'
+        });
+
+        if (!error && data) {
+          setIsAdmin(true);
+        }
+      } catch (error) {
+        console.error('Error checking admin status:', error);
+      }
+    };
+
+    checkAdminStatus();
+  }, [user]);
 
   const NavLinks = () => (
     <>
@@ -41,6 +75,39 @@ export const Layout = ({ children }: LayoutProps) => {
           </Link>
         );
       })}
+      
+      {isAdmin && (
+        <>
+          <Separator className="my-2" />
+          <div className="px-3 py-2">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Admin
+            </p>
+          </div>
+          {adminNavigation.map((item) => {
+            const isActive = location.pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+              >
+                <item.icon className="h-4 w-4" />
+                <span>{item.name}</span>
+                {item.name === 'Admin Dashboard' && (
+                  <Badge variant="secondary" className="ml-auto text-xs">
+                    Admin
+                  </Badge>
+                )}
+              </Link>
+            );
+          })}
+        </>
+      )}
     </>
   );
 

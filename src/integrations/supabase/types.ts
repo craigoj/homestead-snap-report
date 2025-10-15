@@ -67,6 +67,9 @@ export type Database = {
       }
       assessment_submissions: {
         Row: {
+          admin_notes: string | null
+          contacted_at: string | null
+          contacted_by: string | null
           created_at: string
           email: string
           full_name: string
@@ -77,9 +80,13 @@ export type Database = {
           responses: Json
           score: number
           segment: string
+          status: string | null
           submitted_at: string
         }
         Insert: {
+          admin_notes?: string | null
+          contacted_at?: string | null
+          contacted_by?: string | null
           created_at?: string
           email: string
           full_name: string
@@ -90,9 +97,13 @@ export type Database = {
           responses?: Json
           score: number
           segment: string
+          status?: string | null
           submitted_at?: string
         }
         Update: {
+          admin_notes?: string | null
+          contacted_at?: string | null
+          contacted_by?: string | null
           created_at?: string
           email?: string
           full_name?: string
@@ -103,6 +114,7 @@ export type Database = {
           responses?: Json
           score?: number
           segment?: string
+          status?: string | null
           submitted_at?: string
         }
         Relationships: []
@@ -541,33 +553,60 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       waitlist: {
         Row: {
           assessment_id: string | null
           email: string
           id: string
           joined_at: string
+          notes: string | null
           notified: boolean | null
           position: number
           priority_tier: string
+          status: string | null
         }
         Insert: {
           assessment_id?: string | null
           email: string
           id?: string
           joined_at?: string
+          notes?: string | null
           notified?: boolean | null
           position?: number
           priority_tier: string
+          status?: string | null
         }
         Update: {
           assessment_id?: string | null
           email?: string
           id?: string
           joined_at?: string
+          notes?: string | null
           notified?: boolean | null
           position?: number
           priority_tier?: string
+          status?: string | null
         }
         Relationships: [
           {
@@ -584,6 +623,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       log_audit_event: {
         Args: {
           p_entity_id?: string
@@ -595,6 +641,7 @@ export type Database = {
       }
     }
     Enums: {
+      app_role: "admin" | "user"
       asset_category:
         | "electronics"
         | "furniture"
@@ -742,6 +789,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "user"],
       asset_category: [
         "electronics",
         "furniture",

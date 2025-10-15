@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { AdminRoute } from "@/components/AdminRoute";
 import { Layout } from "@/components/Layout";
 import { useWebVitals, defaultWebVitalsReporter } from "@/hooks/useWebVitals";
 import { AssessmentProvider } from "@/hooks/useAssessmentState";
@@ -24,6 +25,9 @@ import Assessment from "./pages/Assessment";
 import AssessmentQuiz from "./pages/AssessmentQuiz";
 import AssessmentResults from "./pages/AssessmentResults";
 import Waitlist from "./pages/Waitlist";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AssessmentsManager from "./pages/admin/AssessmentsManager";
+import WaitlistManager from "./pages/admin/WaitlistManager";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -106,6 +110,30 @@ const App = () => {
                 <Route path="/assessment/quiz" element={<AssessmentQuiz />} />
                 <Route path="/assessment/results" element={<AssessmentResults />} />
                 <Route path="/waitlist" element={<Waitlist />} />
+                
+                {/* Admin Routes - Admin only */}
+                <Route path="/admin" element={
+                  <AdminRoute>
+                    <Layout>
+                      <AdminDashboard />
+                    </Layout>
+                  </AdminRoute>
+                } />
+                <Route path="/admin/assessments" element={
+                  <AdminRoute>
+                    <Layout>
+                      <AssessmentsManager />
+                    </Layout>
+                  </AdminRoute>
+                } />
+                <Route path="/admin/waitlist" element={
+                  <AdminRoute>
+                    <Layout>
+                      <WaitlistManager />
+                    </Layout>
+                  </AdminRoute>
+                } />
+                
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

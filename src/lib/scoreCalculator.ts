@@ -1,3 +1,5 @@
+import { assessmentQuestions } from './assessmentQuestions';
+
 export type ScoreSegment = 'critical' | 'high-risk' | 'moderate' | 'prepared';
 
 export interface ScoreResult {
@@ -9,9 +11,6 @@ export interface ScoreResult {
 export const calculateScore = (answers: Record<string, string>): number => {
   // Only questions 1-10 contribute to score
   const scoringQuestions = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9', 'q10'];
-  
-  // Import questions to get point values
-  const { assessmentQuestions } = require('./assessmentQuestions');
   
   let totalScore = 0;
   

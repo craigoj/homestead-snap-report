@@ -50,7 +50,7 @@ export const Navigation = () => {
               <div className="p-2 bg-gradient-primary rounded-lg group-hover:scale-110 transition-transform duration-300">
                 <Shield className="h-6 w-6 text-white" />
               </div>
-              <span className="text-xl font-bold gradient-text">HomeGuard</span>
+              <span className="text-xl font-bold gradient-text">SnapAssetAI</span>
             </div>
 
             {/* Desktop Navigation */}

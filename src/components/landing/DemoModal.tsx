@@ -15,7 +15,7 @@ export const DemoModal = ({ isOpen, onClose }: DemoModalProps) => {
         <div className="relative bg-black rounded-2xl overflow-hidden">
           <DialogHeader className="absolute top-4 left-4 z-10">
             <DialogTitle className="text-white text-lg font-semibold">
-              HomeGuard Demo - See it in Action
+              SnapAssetAI Demo - See it in Action
             </DialogTitle>
           </DialogHeader>
           
@@ -36,7 +36,7 @@ export const DemoModal = ({ isOpen, onClose }: DemoModalProps) => {
               </div>
               <h3 className="text-xl font-semibold mb-2">Demo Video Coming Soon</h3>
               <p className="text-white/70">
-                Watch how HomeGuard helps you catalog your entire home in minutes
+                Watch how SnapAssetAI helps you catalog your entire home in minutes
               </p>
               <Button 
                 className="btn-premium mt-6"
@@ -57,7 +57,7 @@ export const DemoModal = ({ isOpen, onClose }: DemoModalProps) => {
               width="100%"
               height="100%"
               src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
-              title="HomeGuard Demo"
+              title="SnapAssetAI Demo"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen

@@ -8,7 +8,7 @@ const testimonials = [
     role: "Homeowner",
     location: "Austin, TX",
     rating: 5,
-    quote: "HomeGuard saved me $18,000 on my insurance claim. The AI scanning is incredibly accurate - it found items I forgot I even owned!",
+    quote: "SnapAssetAI saved me $18,000 on my insurance claim. The AI scanning is incredibly accurate - it found items I forgot I even owned!",
     avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=80&h=80&fit=crop&crop=face"
   },
   {
@@ -32,7 +32,7 @@ const testimonials = [
     role: "Collector",
     location: "Seattle, WA",
     rating: 5,
-    quote: "As an art collector, accurate valuations are crucial. HomeGuard's AI valuations are spot-on and save me thousands in appraisal fees.",
+    quote: "As an art collector, accurate valuations are crucial. SnapAssetAI's AI valuations are spot-on and save me thousands in appraisal fees.",
     avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face"
   },
   {
@@ -40,7 +40,7 @@ const testimonials = [
     role: "Insurance Agent",
     location: "Chicago, IL",
     rating: 5,
-    quote: "I recommend HomeGuard to all my clients. The reports are comprehensive and make the claims process so much smoother for everyone.",
+    quote: "I recommend SnapAssetAI to all my clients. The reports are comprehensive and make the claims process so much smoother for everyone.",
     avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=80&h=80&fit=crop&crop=face"
   }
 ];
@@ -85,7 +85,7 @@ export const TestimonialsSection = () => {
             <span className="bg-gradient-primary bg-clip-text text-transparent"> 10,000+ Homeowners</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            See how HomeGuard has helped homeowners save time, money, and stress during insurance claims.
+            See how SnapAssetAI has helped homeowners save time, money, and stress during insurance claims.
           </p>
         </div>
 

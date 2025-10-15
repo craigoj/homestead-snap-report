@@ -1,6 +1,6 @@
 {
-  "name": "HomeGuard - AI-Powered Home Inventory",
-  "short_name": "HomeGuard",
+  "name": "SnapAssetAI - AI-Powered Home Inventory",
+  "short_name": "SnapAssetAI",
   "description": "AI-powered home inventory for insurance claims",
   "start_url": "/",
   "display": "standalone",

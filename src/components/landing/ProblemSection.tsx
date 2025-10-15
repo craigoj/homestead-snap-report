@@ -100,7 +100,7 @@ export const ProblemSection = () => {
           <div className="inline-block p-8 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20">
             <h3 className="text-3xl font-bold mb-4">Don't Become Another Statistic</h3>
             <p className="text-xl text-gray-300 mb-6">
-              Protect your family's financial future with HomeGuard's AI-powered inventory system.
+              Protect your family's financial future with SnapAssetAI's AI-powered inventory system.
             </p>
             <div className="text-4xl font-bold text-warning mb-2">
               $15,000+

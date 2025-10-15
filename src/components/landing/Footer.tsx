@@ -15,7 +15,7 @@ export const Footer = () => {
               <div className="w-10 h-10 rounded-xl bg-gradient-primary p-2">
                 <Shield className="w-6 h-6 text-white" />
               </div>
-              <span className="text-2xl font-bold">HomeGuard</span>
+              <span className="text-2xl font-bold">SnapAssetAI</span>
             </div>
             <p className="text-gray-400 mb-6 leading-relaxed">
               The AI-powered home inventory app that protects your belongings and maximizes your insurance claims. 
@@ -24,11 +24,11 @@ export const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center gap-3 text-gray-400">
                 <Mail className="w-4 h-4" />
-                <span>support@homeguard.app</span>
+                <span>support@snapassetai.com</span>
               </div>
               <div className="flex items-center gap-3 text-gray-400">
                 <Phone className="w-4 h-4" />
-                <span>1-800-HOMEGUARD</span>
+                <span>1-800-SNAPASSET</span>
               </div>
               <div className="flex items-center gap-3 text-gray-400">
                 <MapPin className="w-4 h-4" />
@@ -98,7 +98,7 @@ export const Footer = () => {
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-6 text-sm text-gray-400">
-              <span>© {currentYear} HomeGuard. All rights reserved.</span>
+              <span>© {currentYear} SnapAssetAI. All rights reserved.</span>
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
               <a href="#" className="hover:text-white transition-colors">Cookie Policy</a>

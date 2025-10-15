@@ -33,7 +33,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({ children, ...seoProps }) => {
 // Prebuilt SEO components for common pages
 export const HomePageSEO = () => (
   <SEOHead
-    title="HomeGuard - Smart Home Inventory Management & Insurance Claims"
+    title="SnapAssetAI - Smart Home Inventory Management & Insurance Claims"
     description="Protect your assets with AI-powered home inventory management. Scan, document, and value your belongings for faster insurance claims and complete peace of mind."
     keywords={['home inventory', 'insurance claims', 'asset management', 'AI scanning', 'property protection', 'inventory app']}
     canonicalUrl="/"
@@ -43,7 +43,7 @@ export const HomePageSEO = () => (
 
 export const DashboardSEO = () => (
   <SEOHead
-    title="Dashboard - HomeGuard Inventory Management"
+    title="Dashboard - SnapAssetAI Inventory Management"
     description="Access your complete home inventory dashboard with real-time asset tracking, valuation updates, and insurance documentation."
     keywords={['inventory dashboard', 'asset tracking', 'home management']}
     canonicalUrl="/dashboard"
@@ -53,8 +53,8 @@ export const DashboardSEO = () => (
 
 export const PropertiesSEO = () => (
   <SEOHead
-    title="Properties - Manage Multiple Locations | HomeGuard"
-    description="Organize and manage inventory across multiple properties with HomeGuard's comprehensive property management system."
+    title="Properties - Manage Multiple Locations | SnapAssetAI"
+    description="Organize and manage inventory across multiple properties with SnapAssetAI's comprehensive property management system."
     keywords={['property management', 'multiple properties', 'real estate inventory']}
     canonicalUrl="/properties"
     noIndex={true} // Private page

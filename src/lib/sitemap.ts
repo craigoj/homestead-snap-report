@@ -6,7 +6,7 @@ export interface SitemapEntry {
   priority?: number;
 }
 
-export const generateSitemap = (entries: SitemapEntry[], baseUrl = 'https://homeguard.lovable.app'): string => {
+export const generateSitemap = (entries: SitemapEntry[], baseUrl = 'https://snapassetai.com'): string => {
   
   const xmlHeader = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
   const xmlFooter = '</urlset>';
@@ -41,7 +41,7 @@ export const defaultSitemapEntries: SitemapEntry[] = [
 ];
 
 // Generate robots.txt content
-export const generateRobotsTxt = (baseUrl = 'https://homeguard.lovable.app', sitemapUrl?: string): string => {
+export const generateRobotsTxt = (baseUrl = 'https://snapassetai.com', sitemapUrl?: string): string => {
   const sitemap = sitemapUrl || `${baseUrl}/sitemap.xml`;
   
   return `User-agent: *
@@ -79,7 +79,7 @@ export interface BreadcrumbItem {
   url: string;
 }
 
-export const generateBreadcrumbStructuredData = (items: BreadcrumbItem[], baseUrl = 'https://homeguard.lovable.app'): string => {
+export const generateBreadcrumbStructuredData = (items: BreadcrumbItem[], baseUrl = 'https://snapassetai.com'): string => {
   
   const breadcrumbList = {
     '@context': 'https://schema.org',

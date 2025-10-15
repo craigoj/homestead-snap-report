@@ -14,7 +14,7 @@ export interface SEOProps {
 }
 
 export const generateSEOTags = ({
-  title = 'HomeGuard - Smart Home Inventory Management',
+  title = 'SnapAssetAI - Smart Home Inventory Management',
   description = 'Manage your home inventory with AI-powered scanning, automated valuations, and insurance claim assistance. Protect your assets with comprehensive documentation.',
   keywords = ['home inventory', 'insurance claims', 'asset management', 'property protection', 'AI scanning'],
   canonicalUrl,
@@ -24,7 +24,7 @@ export const generateSEOTags = ({
   noIndex = false,
   structuredData
 }: SEOProps = {}) => {
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://homeguard.lovable.app';
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://snapassetai.com';
   const fullCanonicalUrl = canonicalUrl ? `${baseUrl}${canonicalUrl}` : baseUrl;
   const fullOgImage = ogImage.startsWith('http') ? ogImage : `${baseUrl}${ogImage}`;
 
@@ -33,7 +33,7 @@ export const generateSEOTags = ({
     meta: [
       { name: 'description', content: description },
       { name: 'keywords', content: keywords.join(', ') },
-      { name: 'author', content: 'HomeGuard' },
+      { name: 'author', content: 'SnapAssetAI' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1.0' },
       { name: 'theme-color', content: '#3b82f6' },
       
@@ -44,7 +44,7 @@ export const generateSEOTags = ({
       { property: 'og:url', content: fullCanonicalUrl },
       { property: 'og:image', content: fullOgImage },
       { property: 'og:image:alt', content: title },
-      { property: 'og:site_name', content: 'HomeGuard' },
+      { property: 'og:site_name', content: 'SnapAssetAI' },
       
       // Twitter
       { name: 'twitter:card', content: twitterCard },
@@ -76,12 +76,12 @@ export const createStructuredData = (type: 'WebApplication' | 'Organization' | '
   return JSON.stringify(baseStructure);
 };
 
-// Predefined structured data for HomeGuard
+// Predefined structured data for SnapAssetAI
 export const homeGuardStructuredData = {
   webApplication: createStructuredData('WebApplication', {
-    name: 'HomeGuard',
+    name: 'SnapAssetAI',
     description: 'Smart home inventory management with AI-powered scanning and automated valuations',
-    url: 'https://homeguard.lovable.app',
+    url: 'https://snapassetai.com',
     applicationCategory: 'UtilitiesApplication',
     operatingSystem: 'Web Browser',
     offers: {
@@ -92,20 +92,20 @@ export const homeGuardStructuredData = {
     },
     author: {
       '@type': 'Organization',
-      name: 'HomeGuard',
-      url: 'https://homeguard.lovable.app'
+      name: 'SnapAssetAI',
+      url: 'https://snapassetai.com'
     },
-    screenshot: 'https://homeguard.lovable.app/og-image.jpg'
+    screenshot: 'https://snapassetai.com/og-image.jpg'
   }),
   
   organization: createStructuredData('Organization', {
-    name: 'HomeGuard',
-    url: 'https://homeguard.lovable.app',
-    logo: 'https://homeguard.lovable.app/logo.png',
+    name: 'SnapAssetAI',
+    url: 'https://snapassetai.com',
+    logo: 'https://snapassetai.com/logo.png',
     description: 'Leading provider of smart home inventory management solutions',
     sameAs: [
-      'https://twitter.com/homeguard',
-      'https://linkedin.com/company/homeguard'
+      'https://twitter.com/snapassetai',
+      'https://linkedin.com/company/snapassetai'
     ]
   }),
 
@@ -113,15 +113,15 @@ export const homeGuardStructuredData = {
     mainEntity: [
       {
         '@type': 'Question',
-        name: 'How does HomeGuard help with insurance claims?',
+        name: 'How does SnapAssetAI help with insurance claims?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'HomeGuard provides comprehensive documentation of your assets with photos, receipts, and valuations, making insurance claims faster and more accurate.'
+          text: 'SnapAssetAI provides comprehensive documentation of your assets with photos, receipts, and valuations, making insurance claims faster and more accurate.'
         }
       },
       {
         '@type': 'Question',
-        name: 'Is my data secure with HomeGuard?',
+        name: 'Is my data secure with SnapAssetAI?',
         acceptedAnswer: {
           '@type': 'Answer',
           text: 'Yes, we use enterprise-grade security with encrypted data storage and secure authentication to protect your personal information.'
@@ -129,10 +129,10 @@ export const homeGuardStructuredData = {
       },
       {
         '@type': 'Question',
-        name: 'Can I access HomeGuard on mobile devices?',
+        name: 'Can I access SnapAssetAI on mobile devices?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'HomeGuard is fully responsive and works seamlessly on all devices including smartphones, tablets, and desktop computers.'
+          text: 'SnapAssetAI is fully responsive and works seamlessly on all devices including smartphones, tablets, and desktop computers.'
         }
       }
     ]

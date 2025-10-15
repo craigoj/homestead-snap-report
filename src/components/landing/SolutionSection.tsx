@@ -55,7 +55,7 @@ export const SolutionSection = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <div className="inline-block px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-primary font-semibold mb-6">
-            How HomeGuard Works
+            How SnapAssetAI Works
           </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Three Simple Steps to
@@ -140,7 +140,7 @@ export const SolutionSection = () => {
               <div className="w-24 h-24 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">😰</span>
               </div>
-              <h4 className="text-xl font-bold mb-2">Before HomeGuard</h4>
+              <h4 className="text-xl font-bold mb-2">Before SnapAssetAI</h4>
               <ul className="text-muted-foreground space-y-1">
                 <li>No inventory documentation</li>
                 <li>Uncertain item values</li>
@@ -159,7 +159,7 @@ export const SolutionSection = () => {
               <div className="w-24 h-24 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">🎉</span>
               </div>
-              <h4 className="text-xl font-bold mb-2">With HomeGuard</h4>
+              <h4 className="text-xl font-bold mb-2">With SnapAssetAI</h4>
               <ul className="text-foreground space-y-1">
                 <li className="flex items-center justify-center space-x-2">
                   <CheckCircle className="h-4 w-4 text-success" />

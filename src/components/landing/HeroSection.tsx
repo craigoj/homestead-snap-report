@@ -130,7 +130,7 @@ export const HeroSection = () => {
                     onClick={async () => {
                       setIsSubmitting(true);
                       if (email) {
-                        localStorage.setItem('homeguard-email', email);
+                        localStorage.setItem('snapassetai-email', email);
                       }
                       // Add slight delay for better UX
                       await new Promise(resolve => setTimeout(resolve, 500));
@@ -212,7 +212,7 @@ export const HeroSection = () => {
                   {/* Mock App Interface */}
                   <div className="p-6 space-y-4">
                     <div className="flex items-center justify-between">
-                      <div className="text-2xl font-bold text-gray-900">HomeGuard</div>
+                      <div className="text-2xl font-bold text-gray-900">SnapAssetAI</div>
                       <div className="w-8 h-8 bg-primary rounded-full"></div>
                     </div>
                     

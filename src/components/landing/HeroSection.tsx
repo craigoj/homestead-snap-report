@@ -73,7 +73,7 @@ export const HeroSection = () => {
   }, []);
 
   return (
-    <section id="hero-section" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section id="hero-section" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 md:pt-28">
       {/* Background with gradient and animated blobs */}
       <div className="absolute inset-0 bg-gradient-hero">
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-float" />

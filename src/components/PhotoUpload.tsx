@@ -17,7 +17,21 @@ export const PhotoUpload = ({ onPhotosUploaded, maxPhotos = 5, existingPhotos = 
   const [uploadedPhotos, setUploadedPhotos] = useState<string[]>(existingPhotos);
   const [uploading, setUploading] = useState(false);
 
-  const handleFileSelect = useCallback(async (files: FileList) => {
+  const handleFileSelect = useCallback(async (files: FileList | null) => {
+    if (!files || files.length === 0) {
+      console.log('No files selected');
+      return;
+    }
+
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to upload photos.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (uploadedPhotos.length + files.length > maxPhotos) {
       toast({
         title: "Too Many Photos",
@@ -39,7 +53,7 @@ export const PhotoUpload = ({ onPhotosUploaded, maxPhotos = 5, existingPhotos = 
         if (!file.type.startsWith('image/')) {
           toast({
             title: "Invalid File Type",
-            description: "Please select only image files.",
+            description: `${file.name} is not an image file.`,
             variant: "destructive",
           });
           continue;
@@ -58,9 +72,11 @@ export const PhotoUpload = ({ onPhotosUploaded, maxPhotos = 5, existingPhotos = 
         // Upload to Supabase Storage
         const fileExt = file.name.split('.').pop();
         const fileName = `${Date.now()}_${i}.${fileExt}`;
-        const filePath = `${user!.id}/${fileName}`;
+        const filePath = `${user.id}/${fileName}`;
 
-        const { error: uploadError } = await supabase.storage
+        console.log('Uploading file:', fileName, 'to path:', filePath);
+
+        const { data, error: uploadError } = await supabase.storage
           .from('asset-photos')
           .upload(filePath, file, {
             cacheControl: '3600',
@@ -68,6 +84,7 @@ export const PhotoUpload = ({ onPhotosUploaded, maxPhotos = 5, existingPhotos = 
           });
 
         if (uploadError) {
+          console.error('Upload error:', uploadError);
           toast({
             title: "Upload Failed",
             description: `Failed to upload ${file.name}: ${uploadError.message}`,
@@ -76,28 +93,38 @@ export const PhotoUpload = ({ onPhotosUploaded, maxPhotos = 5, existingPhotos = 
           continue;
         }
 
+        console.log('Upload successful:', data);
         newPhotos.push(filePath);
       }
 
-      const updatedPhotos = [...uploadedPhotos, ...newPhotos];
-      setUploadedPhotos(updatedPhotos);
-      onPhotosUploaded(updatedPhotos);
+      if (newPhotos.length > 0) {
+        const updatedPhotos = [...uploadedPhotos, ...newPhotos];
+        setUploadedPhotos(updatedPhotos);
+        onPhotosUploaded(updatedPhotos);
 
-      toast({
-        title: "Photos Uploaded",
-        description: `${newPhotos.length} photo(s) uploaded successfully.`,
-      });
+        toast({
+          title: "Photos Uploaded",
+          description: `${newPhotos.length} photo(s) uploaded successfully.`,
+        });
+      } else {
+        toast({
+          title: "Upload Failed",
+          description: "No photos were uploaded. Please try again.",
+          variant: "destructive",
+        });
+      }
       
     } catch (error: any) {
+      console.error('Upload exception:', error);
       toast({
         title: "Upload Error",
-        description: error.message,
+        description: error.message || "An unexpected error occurred",
         variant: "destructive",
       });
     } finally {
       setUploading(false);
     }
-  }, [uploadedPhotos, maxPhotos, onPhotosUploaded]);
+  }, [uploadedPhotos, maxPhotos, onPhotosUploaded, user]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -121,13 +148,11 @@ export const PhotoUpload = ({ onPhotosUploaded, maxPhotos = 5, existingPhotos = 
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
-    input.capture = 'environment'; // Use rear camera on mobile
+    input.setAttribute('capture', 'environment'); // Use rear camera on mobile
     input.multiple = maxPhotos > 1;
     input.onchange = (e) => {
       const files = (e.target as HTMLInputElement).files;
-      if (files) {
-        handleFileSelect(files);
-      }
+      handleFileSelect(files);
     };
     input.click();
   };
@@ -139,9 +164,7 @@ export const PhotoUpload = ({ onPhotosUploaded, maxPhotos = 5, existingPhotos = 
     input.multiple = maxPhotos > 1;
     input.onchange = (e) => {
       const files = (e.target as HTMLInputElement).files;
-      if (files) {
-        handleFileSelect(files);
-      }
+      handleFileSelect(files);
     };
     input.click();
   };

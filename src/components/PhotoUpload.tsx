@@ -41,6 +41,27 @@ export const PhotoUpload = ({ onPhotosUploaded, maxPhotos = 5, existingPhotos = 
       return;
     }
 
+    // Preflight check: Verify storage access before uploading
+    try {
+      const { error: preflightError } = await supabase.storage
+        .from('asset-photos')
+        .list(user.id, { limit: 1 });
+      
+      if (preflightError) {
+        console.error('Storage preflight failed:', preflightError);
+        console.log('User ID:', user.id);
+        toast({
+          title: "Storage Access Error",
+          description: `Cannot access your storage folder. ${preflightError.message}. Please try signing out and back in.`,
+          variant: "destructive",
+        });
+        return;
+      }
+      console.log('Storage preflight OK');
+    } catch (e) {
+      console.error('Storage preflight exception:', e);
+    }
+
     setUploading(true);
     
     try {
@@ -63,7 +84,7 @@ export const PhotoUpload = ({ onPhotosUploaded, maxPhotos = 5, existingPhotos = 
         if (file.size > 5 * 1024 * 1024) {
           toast({
             title: "File Too Large",
-            description: `${file.name} is too large. Please select files under 5MB.`,
+            description: `${file.name} is too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Please use "Choose Files" and select images under 5MB.`,
             variant: "destructive",
           });
           continue;
@@ -74,27 +95,67 @@ export const PhotoUpload = ({ onPhotosUploaded, maxPhotos = 5, existingPhotos = 
         const fileName = `${Date.now()}_${i}.${fileExt}`;
         const filePath = `${user.id}/${fileName}`;
 
-        console.log('Uploading file:', fileName, 'to path:', filePath);
+        console.log('Uploading file:', fileName, 'to path:', filePath, 'size:', (file.size / 1024 / 1024).toFixed(2) + 'MB');
 
         const { data, error: uploadError } = await supabase.storage
           .from('asset-photos')
           .upload(filePath, file, {
             cacheControl: '3600',
-            upsert: false
+            upsert: false,
+            contentType: file.type || 'image/jpeg',
           });
 
         if (uploadError) {
-          console.error('Upload error:', uploadError);
-          toast({
-            title: "Upload Failed",
-            description: `Failed to upload ${file.name}: ${uploadError.message}`,
-            variant: "destructive",
-          });
-          continue;
-        }
+          console.error('Upload error details:', uploadError);
+          
+          // Try signed URL upload as fallback
+          console.log('Attempting signed URL upload fallback...');
+          try {
+            const { data: signedData, error: signedError } = await supabase.storage
+              .from('asset-photos')
+              .createSignedUploadUrl(filePath);
+            
+            if (signedError) {
+              console.error('Signed URL creation failed:', signedError);
+              toast({
+                title: "Upload Failed",
+                description: `Failed to upload ${file.name}: ${uploadError.message}`,
+                variant: "destructive",
+              });
+              continue;
+            }
 
-        console.log('Upload successful:', data);
-        newPhotos.push(filePath);
+            const { error: uploadToSignedError } = await supabase.storage
+              .from('asset-photos')
+              .uploadToSignedUrl(signedData.path, signedData.token, file, {
+                contentType: file.type || 'image/jpeg',
+              });
+
+            if (uploadToSignedError) {
+              console.error('Signed URL upload failed:', uploadToSignedError);
+              toast({
+                title: "Upload Failed",
+                description: `Failed to upload ${file.name}: ${uploadToSignedError.message}`,
+                variant: "destructive",
+              });
+              continue;
+            }
+
+            console.log('Upload successful via signed URL');
+            newPhotos.push(filePath);
+          } catch (fallbackError: any) {
+            console.error('Fallback upload exception:', fallbackError);
+            toast({
+              title: "Upload Failed",
+              description: `Failed to upload ${file.name}: ${uploadError.message}`,
+              variant: "destructive",
+            });
+            continue;
+          }
+        } else {
+          console.log('Upload successful:', data);
+          newPhotos.push(filePath);
+        }
       }
 
       if (newPhotos.length > 0) {

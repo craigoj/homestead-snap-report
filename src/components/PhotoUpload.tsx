@@ -128,6 +128,7 @@ export const PhotoUpload = ({ onPhotosUploaded, maxPhotos = 5, existingPhotos = 
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
+    console.log('Drop event triggered, files:', e.dataTransfer.files.length);
     const files = e.dataTransfer.files;
     if (files.length > 0) {
       handleFileSelect(files);
@@ -145,25 +146,31 @@ export const PhotoUpload = ({ onPhotosUploaded, maxPhotos = 5, existingPhotos = 
   };
 
   const triggerCamera = () => {
+    console.log('Camera triggered');
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
     input.setAttribute('capture', 'environment'); // Use rear camera on mobile
     input.multiple = maxPhotos > 1;
     input.onchange = (e) => {
+      console.log('Camera input change event');
       const files = (e.target as HTMLInputElement).files;
+      console.log('Files selected from camera:', files?.length || 0);
       handleFileSelect(files);
     };
     input.click();
   };
 
   const triggerFileSelect = () => {
+    console.log('File select triggered');
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
     input.multiple = maxPhotos > 1;
     input.onchange = (e) => {
+      console.log('File input change event');
       const files = (e.target as HTMLInputElement).files;
+      console.log('Files selected:', files?.length || 0);
       handleFileSelect(files);
     };
     input.click();

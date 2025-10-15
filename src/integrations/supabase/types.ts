@@ -65,6 +65,48 @@ export type Database = {
         }
         Relationships: []
       }
+      assessment_submissions: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          location: string | null
+          phone: string | null
+          priority_level: number
+          responses: Json
+          score: number
+          segment: string
+          submitted_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          location?: string | null
+          phone?: string | null
+          priority_level: number
+          responses?: Json
+          score: number
+          segment: string
+          submitted_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          location?: string | null
+          phone?: string | null
+          priority_level?: number
+          responses?: Json
+          score?: number
+          segment?: string
+          submitted_at?: string
+        }
+        Relationships: []
+      }
       asset_photos: {
         Row: {
           asset_id: string
@@ -495,6 +537,44 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      waitlist: {
+        Row: {
+          assessment_id: string | null
+          email: string
+          id: string
+          joined_at: string
+          notified: boolean | null
+          position: number
+          priority_tier: string
+        }
+        Insert: {
+          assessment_id?: string | null
+          email: string
+          id?: string
+          joined_at?: string
+          notified?: boolean | null
+          position?: number
+          priority_tier: string
+        }
+        Update: {
+          assessment_id?: string | null
+          email?: string
+          id?: string
+          joined_at?: string
+          notified?: boolean | null
+          position?: number
+          priority_tier?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waitlist_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_submissions"
             referencedColumns: ["id"]
           },
         ]

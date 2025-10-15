@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Layout } from "@/components/Layout";
 import { useWebVitals, defaultWebVitalsReporter } from "@/hooks/useWebVitals";
+import { AssessmentProvider } from "@/hooks/useAssessmentState";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -19,6 +20,10 @@ import EditAsset from "./pages/EditAsset";
 import Reports from "./pages/Reports";
 import BulkAssetOperations from "./pages/BulkAssetOperations";
 import HowToGuide from "./pages/HowToGuide";
+import Assessment from "./pages/Assessment";
+import AssessmentQuiz from "./pages/AssessmentQuiz";
+import AssessmentResults from "./pages/AssessmentResults";
+import Waitlist from "./pages/Waitlist";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,9 +37,10 @@ const App = () => {
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <AuthProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
+            <AssessmentProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
@@ -95,10 +101,16 @@ const App = () => {
                     </Layout>
                   </ProtectedRoute>
                 } />
+                {/* Assessment Routes - No auth required */}
+                <Route path="/assessment" element={<Assessment />} />
+                <Route path="/assessment/quiz" element={<AssessmentQuiz />} />
+                <Route path="/assessment/results" element={<AssessmentResults />} />
+                <Route path="/waitlist" element={<Waitlist />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
+            </AssessmentProvider>
           </AuthProvider>
         </TooltipProvider>
       </QueryClientProvider>

@@ -290,6 +290,33 @@ export default function AddAsset() {
       return;
     }
 
+    // Validate numeric fields to prevent overflow
+    const maxNumericValue = 999999999; // PostgreSQL numeric limit for reasonable values
+    
+    if (formData.estimated_value) {
+      const estimatedVal = parseFloat(formData.estimated_value);
+      if (isNaN(estimatedVal) || !isFinite(estimatedVal) || estimatedVal > maxNumericValue || estimatedVal < 0) {
+        toast({
+          title: "Invalid Estimated Value",
+          description: "Please enter a valid estimated value (0 to 999,999,999).",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    if (formData.purchase_price) {
+      const purchasePrice = parseFloat(formData.purchase_price);
+      if (isNaN(purchasePrice) || !isFinite(purchasePrice) || purchasePrice > maxNumericValue || purchasePrice < 0) {
+        toast({
+          title: "Invalid Purchase Price",
+          description: "Please enter a valid purchase price (0 to 999,999,999).",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     setLoading(true);
     
     try {

@@ -317,13 +317,28 @@ export default function AddAsset() {
       }
     }
 
+    // Sanitize numeric inputs (strip symbols, clamp, round to 2 decimals)
+    const sanitizeMoney = (input: string) => {
+      const cleaned = input.replace(/[^0-9.]/g, '');
+      const val = parseFloat(cleaned);
+      if (isNaN(val) || !isFinite(val)) return null;
+      const clamped = Math.min(Math.max(val, 0), maxNumericValue);
+      return Math.round(clamped * 100) / 100;
+    };
+
+    const sanitizedEstimated = formData.estimated_value ? sanitizeMoney(formData.estimated_value) : null;
+    const sanitizedPurchase = formData.purchase_price ? sanitizeMoney(formData.purchase_price) : null;
+    const ocrConf = typeof ocrResult?.confidence === 'number'
+      ? Math.min(100, Math.max(0, Math.round(ocrResult.confidence * 100) / 100))
+      : null;
+
     setLoading(true);
     
     try {
       // Create the asset
       const { data: asset, error: assetError } = await supabase
         .from('assets')
-        .insert([{
+        .insert([{ 
           user_id: user!.id,
           title: formData.title.trim(),
           description: formData.description.trim() || null,
@@ -332,13 +347,13 @@ export default function AddAsset() {
           model: formData.model.trim() || null,
           serial_number: formData.serial_number.trim() || null,
           condition: formData.condition as any,
-          estimated_value: formData.estimated_value ? parseFloat(formData.estimated_value) : null,
+          estimated_value: sanitizedEstimated,
           purchase_date: formData.purchase_date || null,
-          purchase_price: formData.purchase_price ? parseFloat(formData.purchase_price) : null,
+          purchase_price: sanitizedPurchase,
           property_id: formData.property_id,
           room_id: formData.room_id || null,
           ocr_extracted: uploadedPhotos.length > 0 && ocrResult !== null,
-          ocr_confidence: ocrResult?.confidence || null,
+          ocr_confidence: ocrConf,
           ocr_provider: ocrResult?.provider || null,
           ocr_raw_text: ocrResult?.raw_text || null,
           ocr_metadata: ocrResult?.metadata || null,

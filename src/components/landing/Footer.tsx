@@ -99,9 +99,9 @@ export const Footer = () => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-6 text-sm text-gray-400">
               <span>© {currentYear} SnapAssetAI. All rights reserved.</span>
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-white transition-colors">Cookie Policy</a>
+              <a href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</a>
+              <a href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</a>
+              <a href="/privacy-policy#cookies" className="hover:text-white transition-colors">Cookie Policy</a>
             </div>
             
             <div className="flex items-center gap-4">

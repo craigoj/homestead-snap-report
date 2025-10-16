@@ -29,6 +29,9 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AssessmentsManager from "./pages/admin/AssessmentsManager";
 import WaitlistManager from "./pages/admin/WaitlistManager";
 import TestEmail from "./pages/TestEmail";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import Unsubscribe from "./pages/Unsubscribe";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -111,6 +114,11 @@ const App = () => {
                 <Route path="/assessment/quiz" element={<AssessmentQuiz />} />
                 <Route path="/assessment/results" element={<AssessmentResults />} />
                 <Route path="/waitlist" element={<Waitlist />} />
+                
+                {/* Legal Pages - No auth required */}
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/terms-of-service" element={<TermsOfService />} />
+                <Route path="/unsubscribe" element={<Unsubscribe />} />
                 
                 {/* Admin Routes - Admin only */}
                 <Route path="/admin" element={

@@ -151,13 +151,30 @@ export const WaitlistConfirmationEmail = ({
           <Hr style={hr} />
 
           <Text style={footer}>
-            SnapAsset AI - AI-powered home asset documentation
+            <strong>SnapAsset AI</strong> - AI-powered home asset documentation
             <br />
-            Questions? Just reply to this email - we read every message.
+            Complete your inventory in 10 minutes, not 40 hours.
+            <br />
+            <br />
+            123 Tech Street, San Francisco, CA 94105
+            <br />
+            <Link href="mailto:support@snapasset.ai" style={link}>support@snapasset.ai</Link>
           </Text>
 
           <Text style={{ ...footer, fontSize: '12px', marginTop: '16px' }}>
-            Want to leave the waitlist? <Link href="#" style={link}>Unsubscribe</Link>
+            You received this email because you joined the SnapAsset AI waitlist.
+            <br />
+            <Link href={`https://snapasset.ai/unsubscribe?email=${email}`} style={link}>
+              Unsubscribe
+            </Link>
+            {' | '}
+            <Link href="https://snapasset.ai/privacy-policy" style={link}>
+              Privacy Policy
+            </Link>
+            {' | '}
+            <Link href="https://snapasset.ai/terms-of-service" style={link}>
+              Terms of Service
+            </Link>
           </Text>
         </Container>
       </Body>

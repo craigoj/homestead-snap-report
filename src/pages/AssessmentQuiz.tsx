@@ -14,6 +14,7 @@ import { calculateFullScore } from '@/lib/scoreCalculator';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { SEOHead } from '@/components/SEOHead';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const AssessmentQuiz = () => {
   const navigate = useNavigate();
@@ -21,13 +22,14 @@ const AssessmentQuiz = () => {
   const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [emailConsent, setEmailConsent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const totalSteps = assessmentQuestions.length + 1; // +1 for contact info
   const isContactStep = state.currentStep === 0;
   const currentQuestion = !isContactStep ? assessmentQuestions[state.currentStep - 1] : null;
   const currentAnswer = currentQuestion ? state.answers[currentQuestion.id] : null;
-  const canProceed = isContactStep ? (firstName && email && email.includes('@')) : currentAnswer;
+  const canProceed = isContactStep ? (firstName && email && email.includes('@') && emailConsent) : currentAnswer;
 
   // Auto-detect location (simplified - in production use IP geolocation API)
   useEffect(() => {
@@ -41,6 +43,15 @@ const AssessmentQuiz = () => {
   const handleContactSubmit = () => {
     if (!firstName || !email) {
       toast({ title: 'Please fill in required fields', variant: 'destructive' });
+      return;
+    }
+    
+    if (!emailConsent) {
+      toast({ 
+        title: 'Consent required', 
+        description: 'Please agree to receive your assessment results via email.',
+        variant: 'destructive' 
+      });
       return;
     }
     
@@ -189,7 +200,37 @@ const AssessmentQuiz = () => {
                       placeholder="(555) 123-4567"
                     />
                   </div>
+
+                  <div className="flex items-start space-x-3 pt-2">
+                    <Checkbox
+                      id="emailConsent"
+                      checked={emailConsent}
+                      onCheckedChange={(checked) => setEmailConsent(checked as boolean)}
+                      required
+                    />
+                    <Label htmlFor="emailConsent" className="text-sm font-normal cursor-pointer leading-relaxed">
+                      I agree to receive my assessment results and personalized insights via email. 
+                      I understand I can unsubscribe at any time. 
+                      See our{' '}
+                      <a href="/privacy-policy" target="_blank" className="text-primary hover:underline">
+                        Privacy Policy
+                      </a>
+                      .
+                    </Label>
+                  </div>
                 </div>
+
+                <p className="text-xs text-muted-foreground">
+                  By continuing, you agree to our{' '}
+                  <a href="/terms-of-service" target="_blank" className="text-primary hover:underline">
+                    Terms of Service
+                  </a>{' '}
+                  and{' '}
+                  <a href="/privacy-policy" target="_blank" className="text-primary hover:underline">
+                    Privacy Policy
+                  </a>
+                  . Your data is processed securely and never sold to third parties.
+                </p>
               </CardContent>
             </Card>
           ) : (

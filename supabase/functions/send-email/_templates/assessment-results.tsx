@@ -109,13 +109,30 @@ export const AssessmentResultsEmail = ({
           <Hr style={hr} />
 
           <Text style={footer}>
-            SnapAsset AI - AI-powered home asset documentation
+            <strong>SnapAsset AI</strong> - AI-powered home asset documentation
             <br />
             Complete your inventory in 10 minutes, not 40 hours.
+            <br />
+            <br />
+            123 Tech Street, San Francisco, CA 94105
+            <br />
+            <Link href="mailto:support@snapasset.ai" style={link}>support@snapasset.ai</Link>
           </Text>
 
           <Text style={{ ...footer, fontSize: '12px', marginTop: '16px' }}>
-            Not interested? <Link href="#" style={link}>Unsubscribe</Link>
+            You received this email because you completed the Insurance Preparedness Assessment at SnapAsset AI.
+            <br />
+            <Link href={`https://snapasset.ai/unsubscribe?email=${user.email}`} style={link}>
+              Unsubscribe
+            </Link>
+            {' | '}
+            <Link href="https://snapasset.ai/privacy-policy" style={link}>
+              Privacy Policy
+            </Link>
+            {' | '}
+            <Link href="https://snapasset.ai/terms-of-service" style={link}>
+              Terms of Service
+            </Link>
           </Text>
         </Container>
       </Body>

@@ -28,6 +28,7 @@ import Waitlist from "./pages/Waitlist";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AssessmentsManager from "./pages/admin/AssessmentsManager";
 import WaitlistManager from "./pages/admin/WaitlistManager";
+import TestEmail from "./pages/TestEmail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -130,6 +131,13 @@ const App = () => {
                   <AdminRoute>
                     <Layout>
                       <WaitlistManager />
+                    </Layout>
+                  </AdminRoute>
+                } />
+                <Route path="/admin/test-email" element={
+                  <AdminRoute>
+                    <Layout>
+                      <TestEmail />
                     </Layout>
                   </AdminRoute>
                 } />

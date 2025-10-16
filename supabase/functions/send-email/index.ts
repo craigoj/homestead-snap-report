@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import sgMail from "npm:@sendgrid/mail@8.1.0";
 
 const SENDGRID_API_KEY = Deno.env.get("SENDGRID_API_KEY");
 
@@ -39,50 +40,22 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // SendGrid API expects this format
-    const emailData = {
-      personalizations: [
-        {
-          to: [{ email: to }],
-          subject: subject,
-        },
-      ],
-      from: {
-        email: from || "noreply@yourdomain.com", // Replace with your verified sender
-        name: "SnapAsset AI",
-      },
-      content: [
-        {
-          type: "text/html",
-          value: html,
-        },
-      ],
-    };
+    // Set SendGrid API key
+    sgMail.setApiKey(SENDGRID_API_KEY);
 
-    // Add plain text version if provided
-    if (text) {
-      emailData.content.unshift({
-        type: "text/plain",
-        value: text,
-      });
-    }
+    // Prepare email message
+    const msg = {
+      to: to,
+      from: from || "noreply@yourdomain.com", // Change to your verified sender
+      subject: subject,
+      text: text || "",
+      html: html,
+    };
 
     console.log("Sending email to:", to);
 
-    const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${SENDGRID_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(emailData),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("SendGrid API error:", errorText);
-      throw new Error(`SendGrid API error: ${response.status} - ${errorText}`);
-    }
+    // Send email using SendGrid
+    await sgMail.send(msg);
 
     console.log("Email sent successfully to:", to);
 

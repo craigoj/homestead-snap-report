@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, FileX, Clock, DollarSign } from 'lucide-react';
+import { AlertTriangle, FileX, Clock, DollarSign, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const ProblemSection = () => {
@@ -95,25 +95,75 @@ export const ProblemSection = () => {
           ))}
         </div>
 
-        {/* Call to Action */}
-        <div className="text-center mt-16">
-          <div className="inline-block p-8 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20">
-            <h3 className="text-3xl font-bold mb-4">Don't Become Another Statistic</h3>
-            <p className="text-xl text-gray-300 mb-6">
-              Protect your family's financial future with SnapAssetAI's AI-powered inventory system.
+        {/* Assessment CTA Banner */}
+        <div className="mt-16 max-w-4xl mx-auto">
+          <div className="bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-primary/30">
+            <div className="text-center space-y-6">
+              <div className="inline-block px-4 py-2 bg-primary/20 rounded-full border border-primary/40">
+                <span className="text-sm font-semibold text-primary">FREE 3-MINUTE ASSESSMENT</span>
+              </div>
+              
+              <h3 className="text-3xl md:text-4xl font-bold text-white">
+                Not Sure If You're At Risk?
+              </h3>
+              
+              <p className="text-xl text-gray-200 max-w-2xl mx-auto">
+                Take our Insurance Preparedness Assessment and discover your personalized risk score 
+                with actionable recommendations to protect your assets.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+                <Button 
+                  size="lg" 
+                  className="btn-premium px-8 py-6 text-lg font-semibold group"
+                  onClick={() => window.location.href = '/assessment'}
+                >
+                  Get Your Free Score
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                
+                <div className="flex items-center gap-3 text-sm text-gray-300">
+                  <div className="flex items-center">
+                    <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse" />
+                    No signup required
+                  </div>
+                  <span>•</span>
+                  <span>Results in 3 minutes</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-primary mb-2">92%</div>
+                  <div className="text-sm text-gray-300">Found critical gaps</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-primary mb-2">4.8/5</div>
+                  <div className="text-sm text-gray-300">Average rating</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-primary mb-2">10k+</div>
+                  <div className="text-sm text-gray-300">Assessments taken</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Original CTA - Secondary Option */}
+        <div className="text-center mt-12">
+          <div className="inline-block p-8 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
+            <h3 className="text-2xl font-bold mb-4">Already Know You Need Protection?</h3>
+            <p className="text-lg text-gray-300 mb-6">
+              Start your free trial and secure your assets today.
             </p>
-            <div className="text-4xl font-bold text-warning mb-2">
-              $15,000+
-            </div>
-            <div className="text-lg text-gray-300 mb-6">
-              Average amount our users recover that would have been lost
-            </div>
             <Button 
               size="lg" 
-              className="btn-warning px-8 py-4 text-lg font-semibold"
+              variant="outline"
+              className="border-white/20 hover:bg-white/10 px-8 py-4 text-lg font-semibold"
               onClick={() => window.location.href = '/auth'}
             >
-              Get Started - Save Money Today
+              Start Free Trial
             </Button>
           </div>
         </div>

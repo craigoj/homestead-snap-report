@@ -23,6 +23,7 @@ export const Navigation = () => {
     { label: 'Features', href: '#features' },
     { label: 'How it Works', href: '#solution' },
     { label: 'Pricing', href: '#pricing' },
+    { label: 'Free Assessment', href: '/assessment', highlight: true },
     { label: 'Testimonials', href: '#testimonials' },
   ];
 
@@ -59,7 +60,11 @@ export const Navigation = () => {
                 <a
                   key={item.label}
                   href={item.href}
-                  className="text-foreground hover:text-primary transition-colors duration-300 animate-underline"
+                  className={`transition-colors duration-300 animate-underline ${
+                    item.highlight 
+                      ? 'text-primary font-semibold hover:text-primary-glow' 
+                      : 'text-foreground hover:text-primary'
+                  }`}
                 >
                   {item.label}
                 </a>
@@ -119,7 +124,11 @@ export const Navigation = () => {
                 <a
                   key={item.label}
                   href={item.href}
-                  className={`py-3 text-lg font-medium text-foreground hover:text-primary transition-colors animate-fade-in-up stagger-${index + 1}`}
+                  className={`py-3 text-lg font-medium transition-colors animate-fade-in-up stagger-${index + 1} ${
+                    item.highlight
+                      ? 'text-primary font-semibold'
+                      : 'text-foreground hover:text-primary'
+                  }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {item.label}

@@ -167,15 +167,38 @@ export const HeroSection = () => {
               </div>
             </div>
 
-            {/* Secondary CTA */}
+            {/* Assessment CTA */}
             <div className="animate-fade-in-up stagger-5">
+              <div className="flex items-center gap-4">
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+                <span className="text-sm text-muted-foreground">or</span>
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+              </div>
+              <div className="mt-4 text-center">
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  className="border-2 border-primary/30 hover:border-primary hover:bg-primary/5 text-primary font-semibold"
+                  onClick={() => window.location.href = '/assessment'}
+                >
+                  Take Free Assessment
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Get your Insurance Preparedness Score in 3 minutes
+                </p>
+              </div>
+            </div>
+
+            {/* Secondary CTA */}
+            <div className="animate-fade-in-up stagger-6">
               <Button 
                 variant="ghost" 
                 className="text-primary hover:text-primary-glow animate-underline"
                 onClick={() => setShowDemoModal(true)}
               >
+                <Play className="mr-2 h-4 w-4" />
                 Watch 2-minute demo
-                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           </div>

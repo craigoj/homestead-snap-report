@@ -71,7 +71,7 @@ export const PricingSection = () => {
             <span className="bg-gradient-primary bg-clip-text text-transparent"> Protection Plan</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            Start free for 30 days. No credit card required. Cancel anytime.
+            Join the waitlist for priority access when we launch.
           </p>
 
           {/* Billing Toggle */}
@@ -153,9 +153,9 @@ export const PricingSection = () => {
                     ? 'btn-premium'
                     : 'bg-background border-2 border-primary text-primary hover:bg-primary hover:text-white'
                 }`}
-                onClick={() => window.location.href = '/auth'}
+                onClick={() => window.location.href = '/assessment'}
               >
-                Start Free Trial
+                Join Waitlist
               </Button>
             </div>
           ))}
@@ -163,20 +163,20 @@ export const PricingSection = () => {
 
         <div className="text-center mt-16">
           <p className="text-muted-foreground mb-4">
-            All plans include a 30-day free trial and 30-day money-back guarantee
+            Join the early access waitlist - launching soon
           </p>
           <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground">
             <span className="flex items-center gap-2">
               <Check className="w-4 h-4 text-success" />
-              No setup fees
+              Priority access
             </span>
             <span className="flex items-center gap-2">
               <Check className="w-4 h-4 text-success" />
-              Cancel anytime
+              No commitment
             </span>
             <span className="flex items-center gap-2">
               <Check className="w-4 h-4 text-success" />
-              24/7 support
+              Early bird pricing
             </span>
           </div>
         </div>

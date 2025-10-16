@@ -86,9 +86,9 @@ export const FeaturesSection = () => {
           <Button 
             size="lg" 
             className="btn-premium px-12 py-4 text-lg font-semibold rounded-2xl"
-            onClick={() => window.location.href = '/auth'}
+            onClick={() => window.location.href = '/assessment'}
           >
-            Start Your Free Trial
+            Get Your Preparedness Score
           </Button>
         </div>
       </div>

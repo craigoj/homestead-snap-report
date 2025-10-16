@@ -86,15 +86,15 @@ export const Navigation = () => {
                     <Button 
                       variant="ghost" 
                       className="animate-underline"
-                      onClick={() => window.location.href = '/auth'}
+                      onClick={() => window.location.href = '/assessment'}
                     >
                       Sign In
                     </Button>
                     <Button 
                       className="btn-premium rounded-full px-6"
-                      onClick={() => window.location.href = '/auth'}
+                      onClick={() => window.location.href = '/assessment'}
                     >
-                      Start Free Trial
+                      Join Waitlist
                     </Button>
                   </>
                 )
@@ -148,15 +148,15 @@ export const Navigation = () => {
                       <Button 
                         variant="ghost" 
                         className="w-full justify-start"
-                        onClick={() => { setIsMobileMenuOpen(false); window.location.href = '/auth'; }}
+                        onClick={() => { setIsMobileMenuOpen(false); window.location.href = '/assessment'; }}
                       >
                         Sign In
                       </Button>
                       <Button 
                         className="w-full btn-premium"
-                        onClick={() => { setIsMobileMenuOpen(false); window.location.href = '/auth'; }}
+                        onClick={() => { setIsMobileMenuOpen(false); window.location.href = '/assessment'; }}
                       >
-                        Start Free Trial
+                        Join Waitlist
                       </Button>
                     </>
                   )

@@ -99,13 +99,13 @@ const HowToGuide = () => {
           <div className="text-center">
             <Button
               size="lg"
-              onClick={() => navigate('/auth')}
+              onClick={() => navigate('/assessment')}
               className="text-lg px-8"
             >
-              Start Your Free Trial
+              Get Your Assessment Score
             </Button>
             <p className="mt-4 text-sm text-muted-foreground">
-              No credit card required • 30-day free trial
+              Free 3-minute assessment • Join the waitlist for early access
             </p>
           </div>
         </div>

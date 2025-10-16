@@ -186,13 +186,13 @@ export const SolutionSection = () => {
         <div className="text-center mt-12">
           <Button 
             className="btn-premium text-lg px-8 py-4 rounded-full group"
-            onClick={() => window.location.href = '/auth'}
+            onClick={() => window.location.href = '/assessment'}
           >
-            Start Your Free Trial Today
+            Get Started with Assessment
             <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
           </Button>
           <p className="text-muted-foreground mt-4">
-            Join thousands of protected families. No credit card required.
+            Take the free 3-minute assessment to get your preparedness score.
           </p>
         </div>
       </div>

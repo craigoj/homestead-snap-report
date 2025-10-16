@@ -190,9 +190,9 @@ export const TestimonialsSection = () => {
           <Button 
             size="lg" 
             className="btn-premium px-8 py-4 text-lg font-semibold mr-4"
-            onClick={() => window.location.href = '/auth'}
+            onClick={() => window.location.href = '/assessment'}
           >
-            Start Your Free Trial
+            Join the Waitlist
           </Button>
           <Button 
             variant="outline" 

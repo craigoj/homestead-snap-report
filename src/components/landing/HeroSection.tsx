@@ -134,17 +134,17 @@ export const HeroSection = () => {
                       }
                       // Add slight delay for better UX
                       await new Promise(resolve => setTimeout(resolve, 500));
-                      window.location.href = '/auth';
+                      window.location.href = '/assessment';
                     }}
                   >
                     {isSubmitting ? (
                       <>
                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Getting Started...
+                        Taking You to Assessment...
                       </>
                     ) : (
                       <>
-                        Start Free Trial
+                        Join Waitlist
                         <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                       </>
                     )}
@@ -153,15 +153,15 @@ export const HeroSection = () => {
                 <div className="flex items-center space-x-4 mt-4 text-sm text-muted-foreground">
                   <div className="flex items-center space-x-1">
                     <CheckCircle className="h-4 w-4 text-success" />
-                    <span>Free 30-day trial</span>
+                    <span>Join early access waitlist</span>
                   </div>
                   <div className="flex items-center space-x-1">
                     <CheckCircle className="h-4 w-4 text-success" />
-                    <span>No credit card required</span>
+                    <span>Get priority access</span>
                   </div>
                   <div className="flex items-center space-x-1">
                     <CheckCircle className="h-4 w-4 text-success" />
-                    <span>Cancel anytime</span>
+                    <span>No commitment</span>
                   </div>
                 </div>
               </div>

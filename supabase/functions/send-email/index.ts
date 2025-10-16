@@ -46,8 +46,8 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    let emailHtml = html || "";
-    let emailText = text || "";
+    let emailHtml = typeof html === 'string' ? html : '';
+    let emailText = typeof text === 'string' ? text : undefined;
 
     // Render template if specified
     if (template && templateData) {
@@ -66,6 +66,7 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
+    emailHtml = (emailHtml || '').toString().trim();
     if (!emailHtml) {
       return new Response(
         JSON.stringify({ error: "No email content provided (html or template required)" }),
@@ -80,13 +81,16 @@ const handler = async (req: Request): Promise<Response> => {
     sgMail.setApiKey(SENDGRID_API_KEY);
 
     // Prepare email message
-    const msg = {
-      to: to,
+    const msg: any = {
+      to,
       from: from || "craigj@ctrltechhq.com",
-      subject: subject,
-      text: emailText,
+      subject,
       html: emailHtml,
     };
+
+    if (typeof emailText === 'string' && emailText.trim().length > 0) {
+      msg.text = emailText.trim();
+    }
 
     console.log("Sending email to:", to);
 

@@ -82,7 +82,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Prepare email message
     const msg = {
       to: to,
-      from: from || "noreply@snapasset.ai", // Change to your verified sender
+      from: from || "craigj@ctrltechhq.com",
       subject: subject,
       text: emailText,
       html: emailHtml,

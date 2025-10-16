@@ -52,9 +52,38 @@ const AssessmentResults = () => {
 
       if (error) throw error;
 
+      // Get the waitlist entry to find position
+      const { data: waitlistEntry } = await supabase
+        .from('waitlist')
+        .select('position, priority_tier')
+        .eq('email', state.contactInfo!.email)
+        .single();
+
+      // Send waitlist confirmation email
+      if (waitlistEntry) {
+        try {
+          await supabase.functions.invoke('send-email', {
+            body: {
+              to: state.contactInfo!.email,
+              subject: `You're on the SnapAsset AI Waitlist - Position #${waitlistEntry.position}`,
+              template: 'waitlist-confirmation',
+              templateData: {
+                firstName: state.contactInfo!.firstName,
+                position: waitlistEntry.position,
+                priorityTier: waitlistEntry.priority_tier,
+                email: state.contactInfo!.email,
+              },
+            },
+          });
+          console.log('Waitlist confirmation email sent');
+        } catch (emailError) {
+          console.error('Error sending waitlist email:', emailError);
+        }
+      }
+
       toast({
         title: 'Welcome to the waitlist!',
-        description: 'We\'ll notify you as soon as SnapAsset AI launches.',
+        description: 'Check your email for confirmation and next steps.',
       });
 
       navigate('/waitlist');

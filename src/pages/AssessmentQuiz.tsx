@@ -94,6 +94,31 @@ const AssessmentQuiz = () => {
 
       if (assessmentError) throw assessmentError;
 
+      // Send assessment results email
+      try {
+        const { generateInsights } = await import('@/lib/resultGenerator');
+        const insights = generateInsights(scoreResult.score, scoreResult.segment, state.answers);
+        
+        await supabase.functions.invoke('send-email', {
+          body: {
+            to: state.contactInfo!.email,
+            subject: `Your Insurance Preparedness Score: ${scoreResult.score}/100`,
+            template: 'assessment-results',
+            templateData: {
+              firstName: state.contactInfo!.firstName,
+              score: scoreResult.score,
+              segment: scoreResult.segment,
+              insights: insights,
+              resultsUrl: `${window.location.origin}/assessment/results`,
+            },
+          },
+        });
+        console.log('Assessment results email sent');
+      } catch (emailError) {
+        console.error('Error sending email:', emailError);
+        // Don't block navigation if email fails
+      }
+
       // Navigate to results
       navigate('/assessment/results');
     } catch (error: any) {

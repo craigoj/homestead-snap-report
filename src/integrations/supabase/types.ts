@@ -122,30 +122,51 @@ export type Database = {
       asset_photos: {
         Row: {
           asset_id: string
+          camera_make: string | null
+          camera_model: string | null
           created_at: string
+          exif_data: Json | null
           file_name: string
           file_path: string
           file_size: number | null
+          gps_coordinates: Json | null
           id: string
           is_primary: boolean | null
+          original_filename: string | null
+          photo_hash: string | null
+          photo_taken_at: string | null
         }
         Insert: {
           asset_id: string
+          camera_make?: string | null
+          camera_model?: string | null
           created_at?: string
+          exif_data?: Json | null
           file_name: string
           file_path: string
           file_size?: number | null
+          gps_coordinates?: Json | null
           id?: string
           is_primary?: boolean | null
+          original_filename?: string | null
+          photo_hash?: string | null
+          photo_taken_at?: string | null
         }
         Update: {
           asset_id?: string
+          camera_make?: string | null
+          camera_model?: string | null
           created_at?: string
+          exif_data?: Json | null
           file_name?: string
           file_path?: string
           file_size?: number | null
+          gps_coordinates?: Json | null
           id?: string
           is_primary?: boolean | null
+          original_filename?: string | null
+          photo_hash?: string | null
+          photo_taken_at?: string | null
         }
         Relationships: [
           {
@@ -157,8 +178,56 @@ export type Database = {
           },
         ]
       }
+      asset_versions: {
+        Row: {
+          asset_id: string
+          changed_at: string
+          changed_by: string
+          changes: Json
+          id: string
+          reason: string | null
+          snapshot: Json
+          user_id: string
+          version_number: number
+        }
+        Insert: {
+          asset_id: string
+          changed_at?: string
+          changed_by: string
+          changes: Json
+          id?: string
+          reason?: string | null
+          snapshot: Json
+          user_id: string
+          version_number: number
+        }
+        Update: {
+          asset_id?: string
+          changed_at?: string
+          changed_by?: string
+          changes?: Json
+          id?: string
+          reason?: string | null
+          snapshot?: Json
+          user_id?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_versions_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assets: {
         Row: {
+          appraisal_date: string | null
+          appraisal_document_path: string | null
+          appraisal_value: number | null
+          appraiser_name: string | null
           barcode_data: string | null
           brand: string | null
           category: Database["public"]["Enums"]["asset_category"]
@@ -169,6 +238,7 @@ export type Database = {
           equipment_type: Json | null
           estimated_value: number | null
           id: string
+          is_high_value: boolean | null
           model: string | null
           ocr_confidence: number | null
           ocr_extracted: boolean | null
@@ -179,6 +249,7 @@ export type Database = {
           purchase_date: string | null
           purchase_price: number | null
           qr_code_data: string | null
+          requires_appraisal: boolean | null
           room_id: string | null
           serial_number: string | null
           title: string
@@ -186,6 +257,10 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          appraisal_date?: string | null
+          appraisal_document_path?: string | null
+          appraisal_value?: number | null
+          appraiser_name?: string | null
           barcode_data?: string | null
           brand?: string | null
           category?: Database["public"]["Enums"]["asset_category"]
@@ -196,6 +271,7 @@ export type Database = {
           equipment_type?: Json | null
           estimated_value?: number | null
           id?: string
+          is_high_value?: boolean | null
           model?: string | null
           ocr_confidence?: number | null
           ocr_extracted?: boolean | null
@@ -206,6 +282,7 @@ export type Database = {
           purchase_date?: string | null
           purchase_price?: number | null
           qr_code_data?: string | null
+          requires_appraisal?: boolean | null
           room_id?: string | null
           serial_number?: string | null
           title: string
@@ -213,6 +290,10 @@ export type Database = {
           user_id: string
         }
         Update: {
+          appraisal_date?: string | null
+          appraisal_document_path?: string | null
+          appraisal_value?: number | null
+          appraiser_name?: string | null
           barcode_data?: string | null
           brand?: string | null
           category?: Database["public"]["Enums"]["asset_category"]
@@ -223,6 +304,7 @@ export type Database = {
           equipment_type?: Json | null
           estimated_value?: number | null
           id?: string
+          is_high_value?: boolean | null
           model?: string | null
           ocr_confidence?: number | null
           ocr_extracted?: boolean | null
@@ -233,6 +315,7 @@ export type Database = {
           purchase_date?: string | null
           purchase_price?: number | null
           qr_code_data?: string | null
+          requires_appraisal?: boolean | null
           room_id?: string | null
           serial_number?: string | null
           title?: string
@@ -426,6 +509,68 @@ export type Database = {
         }
         Relationships: []
       }
+      loss_events: {
+        Row: {
+          created_at: string
+          deadline_60_days: string | null
+          deadline_notified: boolean | null
+          description: string
+          discovery_date: string
+          estimated_total_loss: number | null
+          event_date: string
+          event_type: string
+          fire_department_report: string | null
+          id: string
+          police_report_number: string | null
+          property_id: string | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deadline_60_days?: string | null
+          deadline_notified?: boolean | null
+          description: string
+          discovery_date: string
+          estimated_total_loss?: number | null
+          event_date: string
+          event_type: string
+          fire_department_report?: string | null
+          id?: string
+          police_report_number?: string | null
+          property_id?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deadline_60_days?: string | null
+          deadline_notified?: boolean | null
+          description?: string
+          discovery_date?: string
+          estimated_total_loss?: number | null
+          event_date?: string
+          event_type?: string
+          fire_department_report?: string | null
+          id?: string
+          police_report_number?: string | null
+          property_id?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loss_events_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           address: string | null
@@ -455,6 +600,68 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      proof_of_loss_forms: {
+        Row: {
+          claim_number: string | null
+          created_at: string
+          form_data: Json
+          id: string
+          insurer_name: string | null
+          loss_event_id: string | null
+          notary_info: Json | null
+          policy_number: string | null
+          signature_data: string | null
+          signature_date: string | null
+          status: string | null
+          submitted_at: string | null
+          sworn_statement_text: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          claim_number?: string | null
+          created_at?: string
+          form_data: Json
+          id?: string
+          insurer_name?: string | null
+          loss_event_id?: string | null
+          notary_info?: Json | null
+          policy_number?: string | null
+          signature_data?: string | null
+          signature_date?: string | null
+          status?: string | null
+          submitted_at?: string | null
+          sworn_statement_text?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          claim_number?: string | null
+          created_at?: string
+          form_data?: Json
+          id?: string
+          insurer_name?: string | null
+          loss_event_id?: string | null
+          notary_info?: Json | null
+          policy_number?: string | null
+          signature_data?: string | null
+          signature_date?: string | null
+          status?: string | null
+          submitted_at?: string | null
+          sworn_statement_text?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proof_of_loss_forms_loss_event_id_fkey"
+            columns: ["loss_event_id"]
+            isOneToOne: false
+            referencedRelation: "loss_events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       properties: {
         Row: {
@@ -517,6 +724,99 @@ export type Database = {
             columns: ["asset_id"]
             isOneToOne: false
             referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      report_templates: {
+        Row: {
+          created_at: string
+          id: string
+          insurer_name: string | null
+          is_default: boolean | null
+          template_config: Json
+          template_name: string
+          template_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          insurer_name?: string | null
+          is_default?: boolean | null
+          template_config: Json
+          template_name: string
+          template_type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          insurer_name?: string | null
+          is_default?: boolean | null
+          template_config?: Json
+          template_name?: string
+          template_type?: string
+        }
+        Relationships: []
+      }
+      room_walkthroughs: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_seconds: number | null
+          id: string
+          linked_asset_ids: string[] | null
+          property_id: string
+          recorded_at: string | null
+          room_id: string | null
+          thumbnail_path: string | null
+          user_id: string
+          video_filename: string
+          video_path: string
+          video_size: number | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          linked_asset_ids?: string[] | null
+          property_id: string
+          recorded_at?: string | null
+          room_id?: string | null
+          thumbnail_path?: string | null
+          user_id: string
+          video_filename: string
+          video_path: string
+          video_size?: number | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          linked_asset_ids?: string[] | null
+          property_id?: string
+          recorded_at?: string | null
+          room_id?: string | null
+          thumbnail_path?: string | null
+          user_id?: string
+          video_filename?: string
+          video_path?: string
+          video_size?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_walkthroughs_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_walkthroughs_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
             referencedColumns: ["id"]
           },
         ]

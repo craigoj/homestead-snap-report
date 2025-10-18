@@ -659,6 +659,7 @@ export default function AddAsset() {
                     type="number"
                     step="0.01"
                     min="0"
+                    max="999999999"
                     value={formData.estimated_value}
                     onChange={(e) => setFormData({...formData, estimated_value: e.target.value})}
                     placeholder="0.00"
@@ -708,6 +709,7 @@ export default function AddAsset() {
                     type="number"
                     step="0.01"
                     min="0"
+                    max="999999999"
                     value={formData.purchase_price}
                     onChange={(e) => setFormData({...formData, purchase_price: e.target.value})}
                     placeholder="0.00"

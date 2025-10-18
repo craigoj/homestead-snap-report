@@ -633,6 +633,9 @@ export default function BulkAssetOperations() {
                     <Label>Set Value ($)</Label>
                     <Input
                       type="number"
+                      step="0.01"
+                      min="0"
+                      max="999999999"
                       placeholder="No change"
                       value={bulkUpdateData.estimated_value}
                       onChange={(e) => setBulkUpdateData(prev => ({ ...prev, estimated_value: e.target.value }))}

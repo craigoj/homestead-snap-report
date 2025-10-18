@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { AlertTriangle } from 'lucide-react';
+import { parseMoney } from '@/lib/numberUtils';
 
 interface LossEventFormProps {
   onSuccess: (eventId: string) => void;
@@ -34,6 +35,21 @@ export const LossEventForm = ({ onSuccess, onCancel }: LossEventFormProps) => {
     e.preventDefault();
     if (!user) return;
 
+    // Sanitize estimated_total_loss
+    let sanitizedLoss = null;
+    if (formData.estimated_total_loss) {
+      sanitizedLoss = parseMoney(formData.estimated_total_loss);
+      if (sanitizedLoss === null) {
+        toast({
+          title: 'Invalid Value',
+          description: 'Estimated total loss must be between $0 and $999,999,999',
+          variant: 'destructive',
+        });
+        return;
+      }
+      console.log('Sanitized loss event value:', { estimated_total_loss: sanitizedLoss });
+    }
+
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -46,7 +62,7 @@ export const LossEventForm = ({ onSuccess, onCancel }: LossEventFormProps) => {
           description: formData.description,
           police_report_number: formData.police_report_number || null,
           fire_department_report: formData.fire_department_report || null,
-          estimated_total_loss: formData.estimated_total_loss ? parseFloat(formData.estimated_total_loss) : null,
+          estimated_total_loss: sanitizedLoss,
           property_id: formData.property_id || null,
         })
         .select()
@@ -168,6 +184,8 @@ export const LossEventForm = ({ onSuccess, onCancel }: LossEventFormProps) => {
             id="estimated_total_loss"
             type="number"
             step="0.01"
+            min="0"
+            max="999999999"
             value={formData.estimated_total_loss}
             onChange={(e) => setFormData({ ...formData, estimated_total_loss: e.target.value })}
             placeholder="$0.00"

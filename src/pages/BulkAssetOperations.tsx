@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { AssetCard } from '@/components/AssetCard';
+import { parseMoney } from '@/lib/numberUtils';
 import {
   Package,
   Download,
@@ -185,7 +186,22 @@ export default function BulkAssetOperations() {
     if (bulkUpdateData.room_id && bulkUpdateData.room_id !== "no-change") updateData.room_id = bulkUpdateData.room_id;
     if (bulkUpdateData.category && bulkUpdateData.category !== "no-change") updateData.category = bulkUpdateData.category;
     if (bulkUpdateData.condition && bulkUpdateData.condition !== "no-change") updateData.condition = bulkUpdateData.condition;
-    if (bulkUpdateData.estimated_value) updateData.estimated_value = parseFloat(bulkUpdateData.estimated_value);
+    
+    // Sanitize estimated_value with parseMoney
+    if (bulkUpdateData.estimated_value) {
+      const sanitized = parseMoney(bulkUpdateData.estimated_value);
+      if (sanitized === null) {
+        toast({
+          title: 'Invalid Value',
+          description: 'Estimated value must be between $0 and $999,999,999',
+          variant: 'destructive'
+        });
+        setOperationLoading(false);
+        return;
+      }
+      updateData.estimated_value = sanitized;
+      console.log('Sanitized bulk update value:', { estimated_value: sanitized });
+    }
 
     if (Object.keys(updateData).length === 0) {
       toast({

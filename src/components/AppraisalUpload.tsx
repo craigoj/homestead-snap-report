@@ -7,6 +7,7 @@ import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { FileText, Upload, X } from 'lucide-react';
+import { parseMoney } from '@/lib/numberUtils';
 
 interface AppraisalUploadProps {
   assetId?: string;
@@ -129,12 +130,25 @@ export const AppraisalUpload = ({ assetId, onAppraisalUploaded, initialData }: A
       return;
     }
 
+    // Sanitize appraisal value
+    const sanitizedValue = parseMoney(appraisalData.appraisalValue);
+    if (sanitizedValue === null) {
+      toast({
+        title: 'Invalid Value',
+        description: 'Appraised value must be between $0 and $999,999,999',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    console.log('Sanitized appraisal before update:', { appraisal_value: sanitizedValue });
+
     setUploading(true);
     try {
       const { error } = await supabase
         .from('assets')
         .update({
-          appraisal_value: appraisalData.appraisalValue,
+          appraisal_value: sanitizedValue,
           appraisal_date: appraisalData.appraisalDate,
           appraiser_name: appraisalData.appraiserName,
         })
@@ -176,9 +190,11 @@ export const AppraisalUpload = ({ assetId, onAppraisalUploaded, initialData }: A
             id="appraisalValue"
             type="number"
             step="0.01"
+            min="0"
+            max="999999999"
             value={appraisalData.appraisalValue || ''}
             onChange={(e) =>
-              setAppraisalData({ ...appraisalData, appraisalValue: parseFloat(e.target.value) })
+              setAppraisalData({ ...appraisalData, appraisalValue: parseFloat(e.target.value) || 0 })
             }
             placeholder="$0.00"
           />

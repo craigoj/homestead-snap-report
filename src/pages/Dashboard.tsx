@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,7 @@ import { toast } from '@/hooks/use-toast';
 import { AssetCard } from '@/components/AssetCard';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { DeadlineWarning } from '@/components/DeadlineWarning';
+import { JumpstartModeSelector } from '@/components/jumpstart';
 import { 
   Home, 
   Package, 
@@ -62,6 +63,7 @@ interface LossEvent {
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [assets, setAssets] = useState<Asset[]>([]);
   const [stats, setStats] = useState<DashboardStats>({ totalAssets: 0, totalValue: 0, properties: 0 });
   const [lossEvents, setLossEvents] = useState<LossEvent[]>([]);
@@ -73,6 +75,7 @@ export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const itemsPerPage = 12;
+  const [showJumpstart, setShowJumpstart] = useState(true);
 
   useEffect(() => {
     if (user) {
@@ -294,8 +297,20 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Quick Actions */}
-      {stats.totalAssets === 0 && (
+      {/* Smart Scan Jumpstart or Empty State */}
+      {stats.totalAssets === 0 && showJumpstart && (
+        <JumpstartModeSelector
+          onModeSelect={(mode) => {
+            navigate(`/assets/add?jumpstart=true&mode=${mode}&prompt=1`);
+          }}
+          onSkip={() => {
+            setShowJumpstart(false);
+          }}
+        />
+      )}
+
+      {/* Fallback Empty State */}
+      {stats.totalAssets === 0 && !showJumpstart && (
         <Card>
           <CardHeader>
             <CardTitle>Get Started</CardTitle>

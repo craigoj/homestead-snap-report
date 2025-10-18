@@ -121,7 +121,12 @@ export default function Reports() {
       const { data: assets, error: assetsError } = await assetQuery;
       if (assetsError) throw assetsError;
 
-      const totalValue = assets?.reduce((sum, asset) => sum + (asset.estimated_value || 0), 0) || 0;
+      const rawTotal = (assets || []).reduce((sum: number, asset: any) => {
+        const vRaw = asset?.estimated_value as unknown;
+        const vNum = typeof vRaw === 'string' ? Number(vRaw) : (typeof vRaw === 'number' ? vRaw : 0);
+        return sum + (Number.isFinite(vNum) && vNum > 0 ? vNum : 0);
+      }, 0);
+      const totalValue = Math.min(rawTotal, 999999999);
       const assetCount = assets?.length || 0;
 
       // Generate share token

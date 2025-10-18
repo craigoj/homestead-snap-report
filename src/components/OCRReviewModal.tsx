@@ -118,9 +118,12 @@ export function OCRReviewModal({
             ) : (
               <Input
                 value={value}
-                onChange={(e) => handleFieldEdit(field, field === 'estimated_value' ? parseFloat(e.target.value) || 0 : e.target.value)}
+                onChange={(e) => handleFieldEdit(field, field === 'estimated_value' ? (Number(e.target.value) || 0) : e.target.value)}
                 className="flex-1"
                 type={field === 'estimated_value' ? 'number' : 'text'}
+                step={field === 'estimated_value' ? 0.01 : undefined}
+                min={field === 'estimated_value' ? 0 : undefined}
+                max={field === 'estimated_value' ? 999999999 : undefined}
               />
             )}
             <Button

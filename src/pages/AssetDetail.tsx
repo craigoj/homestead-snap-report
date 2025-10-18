@@ -442,7 +442,7 @@ export default function AssetDetail() {
                     </Badge>
                     {asset.ocr_confidence && (
                       <span className="text-xs text-muted-foreground">
-                        ({Math.round(asset.ocr_confidence * 100)}%)
+                        ({Math.round(asset.ocr_confidence)}%)
                       </span>
                     )}
                   </div>

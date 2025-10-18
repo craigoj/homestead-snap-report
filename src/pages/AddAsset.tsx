@@ -14,6 +14,7 @@ import { AppraisalUpload } from '@/components/AppraisalUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
+import { parseMoney, parseConfidence } from '@/lib/numberUtils';
 import { 
   Camera, 
   Package, 
@@ -292,47 +293,40 @@ export default function AddAsset() {
       return;
     }
 
-    // Validate numeric fields to prevent overflow
-    const maxNumericValue = 999999999; // PostgreSQL numeric limit for reasonable values
-    
-    if (formData.estimated_value) {
-      const estimatedVal = parseFloat(formData.estimated_value);
-      if (isNaN(estimatedVal) || !isFinite(estimatedVal) || estimatedVal > maxNumericValue || estimatedVal < 0) {
-        toast({
-          title: "Invalid Estimated Value",
-          description: "Please enter a valid estimated value (0 to 999,999,999).",
-          variant: "destructive",
-        });
-        return;
-      }
-    }
-
-    if (formData.purchase_price) {
-      const purchasePrice = parseFloat(formData.purchase_price);
-      if (isNaN(purchasePrice) || !isFinite(purchasePrice) || purchasePrice > maxNumericValue || purchasePrice < 0) {
-        toast({
-          title: "Invalid Purchase Price",
-          description: "Please enter a valid purchase price (0 to 999,999,999).",
-          variant: "destructive",
-        });
-        return;
-      }
-    }
-
-    // Sanitize numeric inputs (strip symbols, clamp, round to 2 decimals)
-    const sanitizeMoney = (input: string) => {
-      const cleaned = input.replace(/[^0-9.]/g, '');
-      const val = parseFloat(cleaned);
-      if (isNaN(val) || !isFinite(val)) return null;
-      const clamped = Math.min(Math.max(val, 0), maxNumericValue);
-      return Math.round(clamped * 100) / 100;
-    };
-
-    const sanitizedEstimated = formData.estimated_value ? sanitizeMoney(formData.estimated_value) : null;
-    const sanitizedPurchase = formData.purchase_price ? sanitizeMoney(formData.purchase_price) : null;
-    const ocrConf = typeof ocrResult?.confidence === 'number'
-      ? Math.min(100, Math.max(0, Math.round(ocrResult.confidence * 100) / 100))
+    // Validate and sanitize numeric fields to prevent overflow
+    const sanitizedEstimated = formData.estimated_value 
+      ? parseMoney(formData.estimated_value) 
       : null;
+    
+    const sanitizedPurchase = formData.purchase_price 
+      ? parseMoney(formData.purchase_price) 
+      : null;
+
+    const ocrConf = parseConfidence(ocrResult?.confidence);
+
+    if (formData.estimated_value && sanitizedEstimated === null) {
+      toast({
+        title: "Invalid Estimated Value",
+        description: "Please enter a valid estimated value (0 to 999,999,999).",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.purchase_price && sanitizedPurchase === null) {
+      toast({
+        title: "Invalid Purchase Price",
+        description: "Please enter a valid purchase price (0 to 999,999,999).",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    console.log('Sanitized values before insert:', { 
+      estimated_value: sanitizedEstimated, 
+      purchase_price: sanitizedPurchase,
+      ocr_confidence: ocrConf
+    });
 
     setLoading(true);
     

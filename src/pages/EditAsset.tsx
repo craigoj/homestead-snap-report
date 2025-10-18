@@ -10,6 +10,7 @@ import { PropertyRoomSelector } from '@/components/PropertyRoomSelector';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
+import { parseMoney } from '@/lib/numberUtils';
 import { 
   ArrowLeft,
   Package, 
@@ -216,6 +217,38 @@ export default function EditAsset() {
       return;
     }
 
+    // Validate and sanitize numeric fields
+    const sanitizedEstimated = formData.estimated_value 
+      ? parseMoney(formData.estimated_value) 
+      : null;
+    
+    const sanitizedPurchase = formData.purchase_price 
+      ? parseMoney(formData.purchase_price) 
+      : null;
+
+    if (formData.estimated_value && sanitizedEstimated === null) {
+      toast({
+        title: "Invalid Estimated Value",
+        description: "Please enter a valid estimated value (0 to 999,999,999).",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.purchase_price && sanitizedPurchase === null) {
+      toast({
+        title: "Invalid Purchase Price",
+        description: "Please enter a valid purchase price (0 to 999,999,999).",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    console.log('Sanitized values before update:', { 
+      estimated_value: sanitizedEstimated, 
+      purchase_price: sanitizedPurchase 
+    });
+
     setSaving(true);
     
     try {
@@ -229,9 +262,9 @@ export default function EditAsset() {
           model: formData.model.trim() || null,
           serial_number: formData.serial_number.trim() || null,
           condition: formData.condition as any,
-          estimated_value: formData.estimated_value ? parseFloat(formData.estimated_value) : null,
+          estimated_value: sanitizedEstimated,
           purchase_date: formData.purchase_date || null,
-          purchase_price: formData.purchase_price ? parseFloat(formData.purchase_price) : null,
+          purchase_price: sanitizedPurchase,
           property_id: formData.property_id,
           room_id: formData.room_id || null,
           updated_at: new Date().toISOString(),

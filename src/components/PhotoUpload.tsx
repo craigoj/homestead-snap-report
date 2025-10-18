@@ -4,7 +4,8 @@ import { Card } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { Camera, Upload, X, ImageIcon } from 'lucide-react';
+import { Camera, Upload, X, ImageIcon, Shield } from 'lucide-react';
+import { extractEXIFData, generatePhotoHash } from '@/lib/exifExtractor';
 
 interface PhotoUploadProps {
   onPhotosUploaded: (photos: string[]) => void;
@@ -90,12 +91,30 @@ export const PhotoUpload = ({ onPhotosUploaded, maxPhotos = 5, existingPhotos = 
           continue;
         }
 
+        // Extract EXIF data and generate hash for photo integrity
+        console.log('Extracting EXIF data and generating hash...');
+        const exifData = await extractEXIFData(file);
+        const photoHash = await generatePhotoHash(file);
+        console.log('EXIF extracted:', exifData.photoTakenAt ? `Photo taken on ${exifData.photoTakenAt}` : 'No date');
+        console.log('Photo hash:', photoHash.substring(0, 16) + '...');
+
         // Upload to Supabase Storage
         const fileExt = file.name.split('.').pop();
         const fileName = `${Date.now()}_${i}.${fileExt}`;
         const filePath = `${user.id}/${fileName}`;
 
         console.log('Uploading file:', fileName, 'to path:', filePath, 'size:', (file.size / 1024 / 1024).toFixed(2) + 'MB');
+
+        // Store EXIF metadata for later (will be saved to asset_photos table)
+        const photoMetadata = {
+          exif_data: exifData.exifData,
+          photo_taken_at: exifData.photoTakenAt,
+          photo_hash: photoHash,
+          gps_coordinates: exifData.gpsCoordinates,
+          camera_make: exifData.cameraMake,
+          camera_model: exifData.cameraModel,
+          original_filename: exifData.originalFilename,
+        };
 
         const { data, error: uploadError } = await supabase.storage
           .from('asset-photos')
@@ -143,6 +162,13 @@ export const PhotoUpload = ({ onPhotosUploaded, maxPhotos = 5, existingPhotos = 
 
             console.log('Upload successful via signed URL');
             newPhotos.push(filePath);
+            // Show photo verification badge if EXIF date is available
+            if (exifData.photoTakenAt) {
+              toast({
+                title: "Photo Verified",
+                description: `${Shield} Photo taken on ${new Date(exifData.photoTakenAt).toLocaleDateString()}`,
+              });
+            }
           } catch (fallbackError: any) {
             console.error('Fallback upload exception:', fallbackError);
             toast({
@@ -155,6 +181,13 @@ export const PhotoUpload = ({ onPhotosUploaded, maxPhotos = 5, existingPhotos = 
         } else {
           console.log('Upload successful:', data);
           newPhotos.push(filePath);
+          // Show photo verification badge if EXIF date is available
+          if (exifData.photoTakenAt) {
+            toast({
+              title: "Photo Verified",
+              description: `Photo taken on ${new Date(exifData.photoTakenAt).toLocaleDateString()}`,
+            });
+          }
         }
       }
 

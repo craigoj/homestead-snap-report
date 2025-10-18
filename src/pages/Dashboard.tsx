@@ -10,6 +10,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
 import { AssetCard } from '@/components/AssetCard';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { DeadlineWarning } from '@/components/DeadlineWarning';
 import { 
   Home, 
   Package, 
@@ -21,7 +22,8 @@ import {
   Filter,
   ArrowUpDown,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  AlertTriangle
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -50,10 +52,19 @@ interface DashboardStats {
   properties: number;
 }
 
+interface LossEvent {
+  id: string;
+  event_type: string;
+  event_date: string;
+  deadline_60_days: string;
+  status: string;
+}
+
 export default function Dashboard() {
   const { user } = useAuth();
   const [assets, setAssets] = useState<Asset[]>([]);
   const [stats, setStats] = useState<DashboardStats>({ totalAssets: 0, totalValue: 0, properties: 0 });
+  const [lossEvents, setLossEvents] = useState<LossEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -67,6 +78,7 @@ export default function Dashboard() {
     if (user) {
       setLoading(true);
       fetchDashboardData();
+      fetchLossEvents();
     }
   }, [user, searchTerm, categoryFilter, sortBy, sortOrder, currentPage]);
 
@@ -139,6 +151,22 @@ export default function Dashboard() {
     }
   };
 
+  const fetchLossEvents = async () => {
+    try {
+      const today = new Date();
+      const { data, error } = await supabase
+        .from('loss_events')
+        .select('*')
+        .eq('status', 'active')
+        .gte('deadline_60_days', today.toISOString().split('T')[0]);
+
+      if (error) throw error;
+      setLossEvents(data || []);
+    } catch (error: any) {
+      console.error('Error loading loss events:', error);
+    }
+  };
+
   const totalPages = Math.ceil(totalCount / itemsPerPage);
 
   const handleSort = (field: typeof sortBy) => {
@@ -204,6 +232,20 @@ export default function Dashboard() {
           </Link>
         </Button>
       </div>
+
+      {/* Deadline Warnings */}
+      {lossEvents.map((event) => {
+        const daysRemaining = Math.ceil((new Date(event.deadline_60_days).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+        return (
+          <DeadlineWarning
+            key={event.id}
+            daysRemaining={daysRemaining}
+            eventId={event.id}
+            eventType={event.event_type}
+            eventDate={event.event_date}
+          />
+        );
+      })}
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

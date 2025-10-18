@@ -32,6 +32,7 @@ import TestEmail from "./pages/TestEmail";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import Unsubscribe from "./pages/Unsubscribe";
+import ProofOfLoss from "./pages/ProofOfLoss";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -107,6 +108,11 @@ const App = () => {
                     <Layout>
                       <BulkAssetOperations />
                     </Layout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/proof-of-loss" element={
+                  <ProtectedRoute>
+                    <ProofOfLoss />
                   </ProtectedRoute>
                 } />
                 {/* Assessment Routes - No auth required */}

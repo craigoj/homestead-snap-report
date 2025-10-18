@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { PhotoUpload } from '@/components/PhotoUpload';
 import { PropertyRoomSelector } from '@/components/PropertyRoomSelector';
 import { OCRReviewModal } from '@/components/OCRReviewModal';
+import { HighValueAlert } from '@/components/HighValueAlert';
+import { AppraisalUpload } from '@/components/AppraisalUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
@@ -573,6 +575,14 @@ export default function AddAsset() {
                 rows={3}
               />
             </div>
+
+            {/* High-Value Item Alert */}
+            {formData.estimated_value && parseFloat(formData.estimated_value) > 0 && (
+              <HighValueAlert 
+                estimatedValue={parseFloat(formData.estimated_value)} 
+                category={formData.category}
+              />
+            )}
 
             <div className="grid gap-4 md:grid-cols-3">
               <div className="space-y-2">

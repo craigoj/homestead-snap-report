@@ -82,39 +82,41 @@ async function getEbayValuation(assetData: ValuationRequest) {
     
     const data = await response.json();
     
-    if (!data.success || data.count < 5) {
-      console.log('Insufficient eBay results (', data.count, '), using AI fallback');
+    // Check if we have sufficient filtered eBay data (lowered from 5 to 3 due to aggressive filtering)
+    if (!data.success || data.filtered_count < 3) {
+      console.log(`Insufficient eBay results (raw: ${data.raw_count}, filtered: ${data.filtered_count}), using AI fallback`);
       return null;
     }
     
-    // Calculate statistics
-    const prices = data.items.map((item: any) => item.price.value).filter((p: number) => p > 0);
+    // Use pre-calculated statistics from eBay search
+    const stats = data.statistics;
     
-    if (prices.length < 5) {
+    if (!stats || stats.count < 3) {
+      console.log('Not enough price data after filtering');
       return null;
     }
     
-    const avgPrice = prices.reduce((sum: number, p: number) => sum + p, 0) / prices.length;
-    const minPrice = Math.min(...prices);
-    const maxPrice = Math.max(...prices);
-    
-    // Get sample items
+    // Get sample items (show what we're basing the valuation on)
     const sampleItems = data.items.slice(0, 3).map((item: any) => ({
       title: item.title,
       price: item.price.value,
       condition: item.condition
     }));
     
-    console.log('eBay data retrieved:', prices.length, 'listings, avg price:', avgPrice);
+    console.log(`eBay data quality: ${data.raw_count} raw listings → ${data.filtered_count} after filtering (removed ${data.raw_count - data.filtered_count} parts/accessories)`);
+    console.log(`Price statistics: Avg $${stats.average.toFixed(2)}, Range $${stats.min}-$${stats.max}, Median $${stats.median}`);
     
     return {
-      average_price: Math.round(avgPrice),
+      average_price: Math.round(stats.average),
       price_range: { 
-        min: Math.round(minPrice), 
-        max: Math.round(maxPrice) 
+        min: Math.round(stats.min), 
+        max: Math.round(stats.max) 
       },
-      listing_count: prices.length,
-      sample_items: sampleItems
+      listing_count: stats.count,
+      sample_items: sampleItems,
+      raw_count: data.raw_count,
+      filtered_count: data.filtered_count,
+      median_price: Math.round(stats.median)
     };
     
   } catch (error) {
@@ -285,22 +287,46 @@ serve(async (req) => {
     
     let finalValuation: EnhancedValuationResponse;
 
-    if (ebayData && ebayData.listing_count >= 5) {
-      // Use eBay data as primary source
-      const confidenceBoost = Math.min(ebayData.listing_count / 5, 10);
+    if (ebayData && ebayData.listing_count >= 3) {
+      // Calculate confidence based on data quality
+      let confidence = 70; // Base confidence for eBay data
+      
+      // Boost with more data points
+      if (ebayData.listing_count >= 5) confidence += 5;
+      if (ebayData.listing_count >= 10) confidence += 5;
+      if (ebayData.listing_count >= 20) confidence += 5;
+      
+      // Reduce confidence if high price variance
+      const priceRange = ebayData.price_range.max - ebayData.price_range.min;
+      const priceVariance = priceRange / ebayData.average_price;
+      if (priceVariance > 1.5) confidence -= 10;
+      if (priceVariance > 2.0) confidence -= 5;
+      
+      // Boost confidence if filtering removed many parts (means we got better quality data)
+      const filterRate = (ebayData.raw_count - ebayData.filtered_count) / ebayData.raw_count;
+      if (filterRate > 0.5 && ebayData.filtered_count >= 5) {
+        confidence += 5; // Aggressive filtering that still left good data
+      }
+      
+      confidence = Math.max(60, Math.min(90, confidence));
+      
+      console.log(`Using eBay valuation with ${ebayData.filtered_count} listings (confidence: ${confidence}%)`);
+      
+      // Use median price for more accurate valuation (less affected by outliers)
+      const valuationPrice = ebayData.median_price || ebayData.average_price;
       
       finalValuation = {
-        estimated_value: ebayData.average_price,
-        confidence: 75 + confidenceBoost,
+        estimated_value: valuationPrice,
+        confidence: confidence,
         value_range: ebayData.price_range,
         data_source: 'ebay',
         ebay_insights: ebayData,
-        reasoning: `Based on ${ebayData.listing_count} current eBay listings. Average sold price: $${ebayData.average_price.toLocaleString()}. Market data provides high confidence in this valuation.`,
+        reasoning: `Based on ${ebayData.filtered_count} verified eBay listings (${ebayData.raw_count} total results, ${ebayData.raw_count - ebayData.filtered_count} parts/accessories filtered out). ${ebayData.median_price ? 'Median' : 'Average'} price: $${valuationPrice.toLocaleString()}. Quality filtering ensures accurate market pricing.`,
+        market_trend: 'stable',
         last_updated: new Date().toISOString()
       };
       
-      console.log('Using eBay valuation with', ebayData.listing_count, 'listings');
-      
+      console.log(`Final valuation: $${finalValuation.estimated_value} confidence: ${finalValuation.confidence}% source: ebay`);
     } else {
       // Fall back to AI-only
       console.log('Using AI-only valuation');

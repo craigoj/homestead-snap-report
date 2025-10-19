@@ -70,11 +70,12 @@ serve(async (req) => {
       : 'https://api.sandbox.ebay.com';
     
     const params = new URLSearchParams();
+    const filters = [];
     
     // Priority: UPC > EPID > searchQuery
     if (upc) {
       params.append('q', upc);
-      params.append('filter', 'buyingOptions:{FIXED_PRICE}');
+      filters.push('buyingOptions:{FIXED_PRICE}');
     } else if (epid) {
       params.append('epid', epid);
     } else {
@@ -97,7 +98,12 @@ serve(async (req) => {
         'poor': 'USED_ACCEPTABLE'
       };
       const ebayCondition = conditionMap[condition.toLowerCase()] || 'USED';
-      params.append('filter', `conditions:{${ebayCondition}}`);
+      filters.push(`conditions:{${ebayCondition}}`);
+    }
+    
+    // Combine all filters with comma
+    if (filters.length > 0) {
+      params.append('filter', filters.join(','));
     }
     
     console.log('Calling eBay Browse API:', `${baseUrl}/buy/browse/v1/item_summary/search?${params}`);

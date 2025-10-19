@@ -44,3 +44,9 @@ verify_jwt = true
 
 [functions.deadline-reminder]
 verify_jwt = false
+
+[functions.ebay-auth]
+verify_jwt = false
+
+[functions.ebay-browse-search]
+verify_jwt = false

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,9 +12,12 @@ import { OCRReviewModal } from '@/components/OCRReviewModal';
 import { HighValueAlert } from '@/components/HighValueAlert';
 import { AppraisalUpload } from '@/components/AppraisalUpload';
 import { ValuationInsights } from '@/components/ValuationInsights';
+import { CelebrationModal } from '@/components/jumpstart/CelebrationModal';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useJumpstartSession } from '@/hooks/useJumpstartSession';
 import { toast } from '@/hooks/use-toast';
+import { getPromptsForMode } from '@/lib/jumpstart/prompts';
 import { parseMoney, parseConfidence } from '@/lib/numberUtils';
 import { 
   Camera, 
@@ -56,6 +59,18 @@ const conditions = ['excellent', 'good', 'fair', 'poor'];
 export default function AddAsset() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { session, completePrompt } = useJumpstartSession();
+  
+  // Jumpstart mode detection
+  const isJumpstart = searchParams.get('jumpstart') === 'true';
+  const jumpstartMode = searchParams.get('mode') || 'quick-win';
+  const promptIndex = parseInt(searchParams.get('prompt') || '1') - 1;
+  const sessionId = searchParams.get('sessionId');
+  
+  // Load current prompt if in jumpstart mode
+  const currentPrompt = isJumpstart ? getPromptsForMode(jumpstartMode)[promptIndex] : null;
+  
   const [loading, setLoading] = useState(false);
   const [ocrLoading, setOcrLoading] = useState(false);
   const [valuationLoading, setValuationLoading] = useState(false);
@@ -64,6 +79,8 @@ export default function AddAsset() {
   const [ocrResult, setOcrResult] = useState<any>(null);
   const [showOCRReview, setShowOCRReview] = useState(false);
   const [ocrImageUrl, setOcrImageUrl] = useState<string>('');
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [createdAssetId, setCreatedAssetId] = useState<string>('');
   const [formData, setFormData] = useState<AssetForm>({
     title: '',
     description: '',
@@ -78,6 +95,17 @@ export default function AddAsset() {
     property_id: '',
     room_id: '',
   });
+
+  // Auto-trigger AI valuation in jumpstart mode when title and category are available
+  useEffect(() => {
+    if (isJumpstart && formData.title && formData.category && !valuationResult && !valuationLoading) {
+      // Small delay to avoid triggering too early
+      const timer = setTimeout(() => {
+        getAIValuation();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isJumpstart, formData.title, formData.category]);
 
   const handlePhotoUpload = async (photos: string[]) => {
     setUploadedPhotos(photos);
@@ -376,11 +404,6 @@ export default function AddAsset() {
         if (photoError) throw photoError;
       }
 
-      toast({
-        title: "Asset Created",
-        description: `${formData.title} has been added to your inventory.`,
-      });
-
       // Log asset creation
       await supabase.rpc('log_audit_event', {
         p_event_type: 'asset_created',
@@ -390,12 +413,27 @@ export default function AddAsset() {
           title: formData.title,
           category: formData.category,
           estimated_value: formData.estimated_value,
-          has_photos: uploadedPhotos.length > 0
+          has_photos: uploadedPhotos.length > 0,
+          jumpstart_mode: isJumpstart
         }
       });
 
-      // Navigate to dashboard or asset detail
-      navigate('/dashboard');
+      // Handle jumpstart mode vs regular mode
+      if (isJumpstart && session) {
+        // Complete the prompt in the jumpstart session
+        await completePrompt(asset.id, sanitizedEstimated || 0);
+        
+        // Store asset ID and show celebration modal
+        setCreatedAssetId(asset.id);
+        setShowCelebration(true);
+      } else {
+        // Regular mode - show toast and navigate
+        toast({
+          title: "Asset Created",
+          description: `${formData.title} has been added to your inventory.`,
+        });
+        navigate('/dashboard');
+      }
       
     } catch (error: any) {
       toast({
@@ -408,15 +446,61 @@ export default function AddAsset() {
     }
   };
 
+  const handleCelebrationContinue = () => {
+    setShowCelebration(false);
+    
+    if (!session) return;
+    
+    const prompts = getPromptsForMode(jumpstartMode);
+    const nextPromptIndex = promptIndex + 1;
+    
+    // Check if there are more prompts
+    if (nextPromptIndex < prompts.length) {
+      // Navigate to next prompt
+      navigate(`/jumpstart/guide?mode=${jumpstartMode}`);
+    } else {
+      // All prompts complete - go to completion screen
+      navigate('/jumpstart/complete');
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Add New Asset</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          {isJumpstart && currentPrompt ? `Scan your ${currentPrompt.item}` : 'Add New Asset'}
+        </h1>
         <p className="text-muted-foreground">
-          Take photos or enter details manually to add items to your inventory.
+          {isJumpstart && currentPrompt 
+            ? currentPrompt.rationale 
+            : 'Take photos or enter details manually to add items to your inventory.'
+          }
         </p>
       </div>
+
+      {/* Jumpstart Progress Indicator */}
+      {isJumpstart && session && (
+        <Card className="bg-primary/5 border-primary/20">
+          <CardContent className="py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">
+                  Item {promptIndex + 1} of {session.items_target}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  💎 Total Protected: ${session.total_value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-muted-foreground">
+                  Typical value: {currentPrompt?.typicalValue}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid gap-6 lg:grid-cols-2">
@@ -560,16 +644,18 @@ export default function AddAsset() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
-                placeholder="Additional details about this item..."
-                rows={3}
-              />
-            </div>
+            {!isJumpstart && (
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({...formData, description: e.target.value})}
+                  placeholder="Additional details about this item..."
+                  rows={3}
+                />
+              </div>
+            )}
 
             {/* High-Value Item Alert */}
             {formData.estimated_value && parseFloat(formData.estimated_value) > 0 && (
@@ -691,47 +777,74 @@ export default function AddAsset() {
                 )}
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="purchase_price">Purchase Price</Label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                  <Input
-                    id="purchase_price"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    max="999999999"
-                    value={formData.purchase_price}
-                    onChange={(e) => setFormData({...formData, purchase_price: e.target.value})}
-                    placeholder="0.00"
-                    className="pl-10"
-                  />
+              {!isJumpstart && (
+                <div className="space-y-2">
+                  <Label htmlFor="purchase_price">Purchase Price</Label>
+                  <div className="relative">
+                    <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                    <Input
+                      id="purchase_price"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="999999999"
+                      value={formData.purchase_price}
+                      onChange={(e) => setFormData({...formData, purchase_price: e.target.value})}
+                      placeholder="0.00"
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="purchase_date">Purchase Date</Label>
-              <Input
-                id="purchase_date"
-                type="date"
-                value={formData.purchase_date}
-                onChange={(e) => setFormData({...formData, purchase_date: e.target.value})}
-              />
-            </div>
+            {!isJumpstart && (
+              <div className="space-y-2">
+                <Label htmlFor="purchase_date">Purchase Date</Label>
+                <Input
+                  id="purchase_date"
+                  type="date"
+                  value={formData.purchase_date}
+                  onChange={(e) => setFormData({...formData, purchase_date: e.target.value})}
+                />
+              </div>
+            )}
           </CardContent>
         </Card>
 
         {/* Action Buttons */}
         <div className="flex justify-end space-x-4">
-          <Button type="button" variant="outline" onClick={() => navigate('/dashboard')}>
-            Cancel
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={() => isJumpstart ? navigate('/jumpstart/guide?mode=' + jumpstartMode) : navigate('/dashboard')}
+          >
+            {isJumpstart ? 'Back' : 'Cancel'}
           </Button>
-          <Button type="submit" disabled={loading || ocrLoading}>
-            {loading ? 'Creating...' : 'Create Asset'}
+          <Button 
+            type="submit" 
+            disabled={loading || ocrLoading}
+            size={isJumpstart ? 'lg' : 'default'}
+            className={isJumpstart ? 'px-8' : ''}
+          >
+            {loading ? 'Saving...' : isJumpstart ? 'Save & Continue' : 'Create Asset'}
           </Button>
         </div>
       </form>
+
+      {/* Celebration Modal */}
+      {isJumpstart && session && (
+        <CelebrationModal
+          isOpen={showCelebration}
+          onClose={() => setShowCelebration(false)}
+          itemName={formData.title}
+          estimatedValue={parseFloat(formData.estimated_value) || 0}
+          itemNumber={promptIndex + 1}
+          totalItems={session.items_target}
+          runningTotal={session.total_value}
+          onContinue={handleCelebrationContinue}
+        />
+      )}
 
       {/* OCR Review Modal */}
       {ocrResult && (

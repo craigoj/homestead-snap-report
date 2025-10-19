@@ -2,42 +2,46 @@ import { Zap, Trophy, Home, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { JumpstartMode, QUICK_WIN_PROMPTS, HIGH_VALUE_PROMPTS, ROOM_BLITZ_PROMPTS } from "@/lib/jumpstart/prompts";
 
 interface JumpstartModeSelectorProps {
   onModeSelect: (mode: 'quick-win' | 'high-value' | 'room-blitz') => void;
   onSkip: () => void;
 }
 
-const modes = [
+const modes: JumpstartMode[] = [
   {
-    id: 'quick-win' as const,
+    id: 'quick-win',
     name: 'Quick Win',
     description: 'Perfect for getting started',
-    time: '2 minutes',
+    time: '3 minutes',
     items: 3,
     value: '$2,000-5,000',
     icon: Zap,
-    popular: true
+    popular: true,
+    prompts: QUICK_WIN_PROMPTS
   },
   {
-    id: 'high-value' as const,
+    id: 'high-value',
     name: 'High-Value Hunt',
     description: 'Focus on expensive items',
-    time: '10 minutes',
+    time: '5 minutes',
     items: 5,
     value: '$5,000-15,000',
     icon: Trophy,
-    popular: false
+    popular: false,
+    prompts: HIGH_VALUE_PROMPTS
   },
   {
-    id: 'room-blitz' as const,
+    id: 'room-blitz',
     name: 'Room Blitz',
     description: 'Complete one room',
-    time: '30 minutes',
+    time: '10 minutes',
     items: 15,
     value: '$10,000-30,000',
     icon: Home,
-    popular: false
+    popular: false,
+    prompts: ROOM_BLITZ_PROMPTS
   }
 ];
 

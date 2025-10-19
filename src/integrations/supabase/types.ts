@@ -620,6 +620,135 @@ export type Database = {
         }
         Relationships: []
       }
+      jumpstart_feedback: {
+        Row: {
+          completion_time_seconds: number | null
+          created_at: string | null
+          feedback_text: string | null
+          helpful: boolean | null
+          id: string
+          prompt_id: string
+          skipped: boolean | null
+          user_id: string
+        }
+        Insert: {
+          completion_time_seconds?: number | null
+          created_at?: string | null
+          feedback_text?: string | null
+          helpful?: boolean | null
+          id?: string
+          prompt_id: string
+          skipped?: boolean | null
+          user_id: string
+        }
+        Update: {
+          completion_time_seconds?: number | null
+          created_at?: string | null
+          feedback_text?: string | null
+          helpful?: boolean | null
+          id?: string
+          prompt_id?: string
+          skipped?: boolean | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      jumpstart_prompts: {
+        Row: {
+          asset_id: string | null
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          item_category: string | null
+          prompt_id: string
+          prompt_index: number
+          session_id: string
+          skipped: boolean | null
+        }
+        Insert: {
+          asset_id?: string | null
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          item_category?: string | null
+          prompt_id: string
+          prompt_index: number
+          session_id: string
+          skipped?: boolean | null
+        }
+        Update: {
+          asset_id?: string | null
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          item_category?: string | null
+          prompt_id?: string
+          prompt_index?: number
+          session_id?: string
+          skipped?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jumpstart_prompts_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jumpstart_prompts_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "jumpstart_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jumpstart_sessions: {
+        Row: {
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          items_completed: number | null
+          items_target: number
+          mode: string
+          skipped: boolean | null
+          started_at: string | null
+          total_value: number | null
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          items_completed?: number | null
+          items_target: number
+          mode: string
+          skipped?: boolean | null
+          started_at?: string | null
+          total_value?: number | null
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          items_completed?: number | null
+          items_target?: number
+          mode?: string
+          skipped?: boolean | null
+          started_at?: string | null
+          total_value?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       loss_events: {
         Row: {
           created_at: string

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { ValuationInsights } from '@/components/ValuationInsights';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
@@ -18,7 +19,8 @@ import {
   MapPin,
   Camera,
   FileText,
-  ExternalLink
+  ExternalLink,
+  RefreshCw
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -38,6 +40,9 @@ interface Asset {
   ocr_confidence: number;
   created_at: string;
   updated_at: string;
+  valuation_data_source: string;
+  valuation_last_updated: string;
+  ebay_valuation_id: string;
   properties: {
     id: string;
     name: string;
@@ -47,6 +52,17 @@ interface Asset {
     id: string;
     name: string;
   } | null;
+  ebay_valuations?: {
+    id: string;
+    estimated_value: number;
+    confidence_score: number;
+    value_range_min: number;
+    value_range_max: number;
+    data_source: string;
+    ebay_data: any;
+    reasoning: string;
+    market_trend: string;
+  };
 }
 
 interface AssetPhoto {
@@ -71,6 +87,7 @@ export default function AssetDetail() {
   const [photos, setPhotos] = useState<AssetPhoto[]>([]);
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [loading, setLoading] = useState(true);
+  const [revaluating, setRevaluating] = useState(false);
 
   useEffect(() => {
     if (id && user) {
@@ -80,13 +97,24 @@ export default function AssetDetail() {
 
   const fetchAsset = async () => {
     try {
-      // Fetch asset details
+      // Fetch asset details with valuation data
       const { data: assetData, error: assetError } = await supabase
         .from('assets')
         .select(`
           *,
           properties (id, name, address),
-          rooms (id, name)
+          rooms (id, name),
+          ebay_valuations (
+            id,
+            estimated_value,
+            confidence_score,
+            value_range_min,
+            value_range_max,
+            data_source,
+            ebay_data,
+            reasoning,
+            market_trend
+          )
         `)
         .eq('id', id)
         .single();
@@ -152,6 +180,80 @@ export default function AssetDetail() {
         description: error.message,
         variant: "destructive",
       });
+    }
+  };
+
+  const revalueAsset = async () => {
+    if (!asset) return;
+    
+    setRevaluating(true);
+    try {
+      // Call valuation-estimate edge function
+      const { data: valuationData, error: valuationError } = await supabase.functions.invoke(
+        'valuation-estimate',
+        {
+          body: {
+            title: asset.title,
+            description: asset.description,
+            category: asset.category,
+            brand: asset.brand,
+            model: asset.model,
+            condition: asset.condition,
+            purchase_price: asset.purchase_price,
+          }
+        }
+      );
+
+      if (valuationError) throw valuationError;
+
+      // Store valuation in ebay_valuations table
+      const { data: ebayValuation, error: ebayValuationError } = await supabase
+        .from('ebay_valuations')
+        .insert({
+          asset_id: asset.id,
+          user_id: user?.id,
+          estimated_value: valuationData.estimated_value,
+          confidence_score: valuationData.confidence,
+          value_range_min: valuationData.value_range.min,
+          value_range_max: valuationData.value_range.max,
+          data_source: valuationData.data_source,
+          ebay_data: valuationData.ebay_insights || null,
+          reasoning: valuationData.reasoning,
+          market_trend: valuationData.market_trend || null,
+        })
+        .select()
+        .single();
+
+      if (ebayValuationError) throw ebayValuationError;
+
+      // Update asset with new valuation
+      const { error: updateError } = await supabase
+        .from('assets')
+        .update({
+          estimated_value: valuationData.estimated_value,
+          ebay_valuation_id: ebayValuation.id,
+          valuation_data_source: valuationData.data_source,
+          valuation_last_updated: new Date().toISOString(),
+        })
+        .eq('id', asset.id);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Valuation Updated",
+        description: `New estimated value: $${valuationData.estimated_value.toLocaleString()}`,
+      });
+
+      // Refresh asset data
+      await fetchAsset();
+    } catch (error: any) {
+      toast({
+        title: "Valuation Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setRevaluating(false);
     }
   };
 
@@ -397,14 +499,54 @@ export default function AssetDetail() {
 
               <Separator />
 
-              {asset.estimated_value && (
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Est. Value</span>
-                  <span className="text-lg font-bold text-primary">
-                    ${asset.estimated_value.toLocaleString()}
-                  </span>
+              {/* Current Valuation Section */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Current Valuation</span>
+                  {asset.valuation_last_updated && (
+                    <span className="text-xs text-muted-foreground">
+                      Updated {new Date(asset.valuation_last_updated).toLocaleDateString()}
+                    </span>
+                  )}
                 </div>
-              )}
+
+                {asset.ebay_valuations ? (
+                  <ValuationInsights 
+                    valuation={{
+                      estimated_value: asset.ebay_valuations.estimated_value,
+                      confidence: asset.ebay_valuations.confidence_score,
+                      value_range: {
+                        min: asset.ebay_valuations.value_range_min,
+                        max: asset.ebay_valuations.value_range_max,
+                      },
+                      data_source: asset.ebay_valuations.data_source as 'ebay' | 'ai' | 'hybrid',
+                      ebay_insights: asset.ebay_valuations.ebay_data,
+                      reasoning: asset.ebay_valuations.reasoning,
+                      market_trend: asset.ebay_valuations.market_trend as 'stable' | 'appreciating' | 'depreciating' | undefined,
+                    }} 
+                  />
+                ) : asset.estimated_value ? (
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Est. Value</span>
+                    <span className="text-lg font-bold text-primary">
+                      ${asset.estimated_value.toLocaleString()}
+                    </span>
+                  </div>
+                ) : null}
+
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={revalueAsset}
+                  disabled={revaluating}
+                  className="w-full"
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${revaluating ? 'animate-spin' : ''}`} />
+                  {revaluating ? 'Getting Valuation...' : 'Get Updated Valuation'}
+                </Button>
+              </div>
+
+              <Separator />
 
               {asset.purchase_price && (
                 <div className="flex justify-between">

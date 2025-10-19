@@ -11,6 +11,7 @@ import { PropertyRoomSelector } from '@/components/PropertyRoomSelector';
 import { OCRReviewModal } from '@/components/OCRReviewModal';
 import { HighValueAlert } from '@/components/HighValueAlert';
 import { AppraisalUpload } from '@/components/AppraisalUpload';
+import { ValuationInsights } from '@/components/ValuationInsights';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
@@ -667,36 +668,26 @@ export default function AddAsset() {
                   />
                 </div>
                 {valuationResult && (
-                  <div className="p-3 bg-muted rounded-lg space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <TrendingUp className="h-4 w-4 text-primary" />
-                        <span className="font-medium">AI Valuation</span>
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {valuationResult.confidence}% confidence
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span>Estimated Value:</span>
-                        <span className="font-semibold">${valuationResult.estimated_value}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Range:</span>
-                        <span>${valuationResult.value_range.min} - ${valuationResult.value_range.max}</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{valuationResult.reasoning}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" onClick={acceptAIValuation}>
-                        Accept Value
+                  <>
+                    <ValuationInsights valuation={valuationResult} />
+                    <div className="flex gap-2 mt-3">
+                      <Button 
+                        size="sm" 
+                        onClick={acceptAIValuation}
+                        className="flex items-center gap-2"
+                      >
+                        <CheckCircle className="h-4 w-4" />
+                        Accept This Value
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => setValuationResult(null)}>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => setValuationResult(null)}
+                      >
                         Dismiss
                       </Button>
                     </div>
-                  </div>
+                  </>
                 )}
               </div>
               

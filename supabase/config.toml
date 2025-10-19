@@ -50,3 +50,6 @@ verify_jwt = false
 
 [functions.ebay-browse-search]
 verify_jwt = false
+
+[functions.ebay-account-deletion]
+verify_jwt = false

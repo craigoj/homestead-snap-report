@@ -235,8 +235,11 @@ export type Database = {
           created_at: string
           description: string | null
           device_specifications: Json | null
+          ebay_epid: string | null
+          ebay_valuation_id: string | null
           equipment_type: Json | null
           estimated_value: number | null
+          gtin: string | null
           id: string
           is_high_value: boolean | null
           model: string | null
@@ -253,8 +256,11 @@ export type Database = {
           room_id: string | null
           serial_number: string | null
           title: string
+          upc: string | null
           updated_at: string
           user_id: string
+          valuation_data_source: string | null
+          valuation_last_updated: string | null
         }
         Insert: {
           appraisal_date?: string | null
@@ -268,8 +274,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           device_specifications?: Json | null
+          ebay_epid?: string | null
+          ebay_valuation_id?: string | null
           equipment_type?: Json | null
           estimated_value?: number | null
+          gtin?: string | null
           id?: string
           is_high_value?: boolean | null
           model?: string | null
@@ -286,8 +295,11 @@ export type Database = {
           room_id?: string | null
           serial_number?: string | null
           title: string
+          upc?: string | null
           updated_at?: string
           user_id: string
+          valuation_data_source?: string | null
+          valuation_last_updated?: string | null
         }
         Update: {
           appraisal_date?: string | null
@@ -301,8 +313,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           device_specifications?: Json | null
+          ebay_epid?: string | null
+          ebay_valuation_id?: string | null
           equipment_type?: Json | null
           estimated_value?: number | null
+          gtin?: string | null
           id?: string
           is_high_value?: boolean | null
           model?: string | null
@@ -319,10 +334,20 @@ export type Database = {
           room_id?: string | null
           serial_number?: string | null
           title?: string
+          upc?: string | null
           updated_at?: string
           user_id?: string
+          valuation_data_source?: string | null
+          valuation_last_updated?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "assets_ebay_valuation_id_fkey"
+            columns: ["ebay_valuation_id"]
+            isOneToOne: false
+            referencedRelation: "ebay_valuations"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "assets_property_id_fkey"
             columns: ["property_id"]
@@ -418,6 +443,92 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ebay_tokens: {
+        Row: {
+          access_token: string
+          created_at: string | null
+          expires_at: string
+          id: string
+          token_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          access_token: string
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          token_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          access_token?: string
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          token_type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      ebay_valuations: {
+        Row: {
+          asset_id: string | null
+          confidence_score: number | null
+          created_at: string | null
+          data_source: string | null
+          ebay_data: Json | null
+          estimated_value: number | null
+          id: string
+          market_trend: string | null
+          reasoning: string | null
+          search_method: string | null
+          search_query: string | null
+          user_id: string | null
+          value_range_max: number | null
+          value_range_min: number | null
+        }
+        Insert: {
+          asset_id?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          data_source?: string | null
+          ebay_data?: Json | null
+          estimated_value?: number | null
+          id?: string
+          market_trend?: string | null
+          reasoning?: string | null
+          search_method?: string | null
+          search_query?: string | null
+          user_id?: string | null
+          value_range_max?: number | null
+          value_range_min?: number | null
+        }
+        Update: {
+          asset_id?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          data_source?: string | null
+          ebay_data?: Json | null
+          estimated_value?: number | null
+          id?: string
+          market_trend?: string | null
+          reasoning?: string | null
+          search_method?: string | null
+          search_query?: string | null
+          user_id?: string | null
+          value_range_max?: number | null
+          value_range_min?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ebay_valuations_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
             referencedColumns: ["id"]
           },
         ]
@@ -923,6 +1034,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_valid_ebay_token: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          access_token: string
+          expires_at: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -936,6 +1054,18 @@ export type Database = {
           p_entity_type?: string
           p_event_type: Database["public"]["Enums"]["event_type"]
           p_metadata?: Json
+        }
+        Returns: string
+      }
+      should_revalue_asset: {
+        Args: { p_asset_id: string }
+        Returns: boolean
+      }
+      upsert_ebay_token: {
+        Args: {
+          p_access_token: string
+          p_expires_at: string
+          p_token_type: string
         }
         Returns: string
       }

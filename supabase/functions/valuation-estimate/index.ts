@@ -208,11 +208,14 @@ Respond with only valid JSON in this format:
   }
 
   const data = await response.json();
-  const content = data.choices[0]?.message?.content;
+  let content = data.choices[0]?.message?.content;
 
   if (!content) {
     throw new Error('No content returned from OpenAI');
   }
+
+  // Remove markdown code fences if present
+  content = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
 
   try {
     const result = JSON.parse(content);

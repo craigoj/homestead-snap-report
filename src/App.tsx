@@ -33,6 +33,8 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import Unsubscribe from "./pages/Unsubscribe";
 import ProofOfLoss from "./pages/ProofOfLoss";
+import JumpstartGuide from "./pages/JumpstartGuide";
+import JumpstartComplete from "./pages/JumpstartComplete";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -113,6 +115,16 @@ const App = () => {
                 <Route path="/proof-of-loss" element={
                   <ProtectedRoute>
                     <ProofOfLoss />
+                  </ProtectedRoute>
+                } />
+                <Route path="/jumpstart/guide" element={
+                  <ProtectedRoute>
+                    <JumpstartGuide />
+                  </ProtectedRoute>
+                } />
+                <Route path="/jumpstart/complete" element={
+                  <ProtectedRoute>
+                    <JumpstartComplete />
                   </ProtectedRoute>
                 } />
                 {/* Assessment Routes - No auth required */}

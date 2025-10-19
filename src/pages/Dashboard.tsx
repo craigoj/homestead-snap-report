@@ -298,16 +298,17 @@ export default function Dashboard() {
       </div>
 
       {/* Smart Scan Jumpstart or Empty State */}
-      {stats.totalAssets === 0 && showJumpstart && (
-        <JumpstartModeSelector
-          onModeSelect={(mode) => {
-            navigate(`/assets/add?jumpstart=true&mode=${mode}&prompt=1`);
-          }}
-          onSkip={() => {
-            setShowJumpstart(false);
-          }}
-        />
-      )}
+          {stats.totalAssets === 0 && showJumpstart && (
+            <JumpstartModeSelector
+              onModeSelect={(mode) => {
+                navigate(`/jumpstart/guide?mode=${mode}`);
+              }}
+              onSkip={() => {
+                setShowJumpstart(false);
+                localStorage.setItem('jumpstart_skipped', 'true');
+              }}
+            />
+          )}
 
       {/* Fallback Empty State */}
       {stats.totalAssets === 0 && !showJumpstart && (

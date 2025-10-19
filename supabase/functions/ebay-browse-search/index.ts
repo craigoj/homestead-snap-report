@@ -1,8 +1,23 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+// Cache TTL by category (in hours)
+const CACHE_TTL_HOURS: Record<string, number> = {
+  electronics: 48,
+  appliances: 72,
+  furniture: 96,
+  jewelry: 24,  // Prices fluctuate faster
+  clothing: 48,
+  art: 72,
+  books: 96,
+  tools: 72,
+  sports: 48,
+  other: 48
 };
 
 // eBay category mapping (SnapAssetAI → eBay)
@@ -114,12 +129,40 @@ serve(async (req) => {
 
     console.log('eBay search request:', { searchQuery, category, condition, upc, epid });
     
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    const supabase = createClient(supabaseUrl!, serviceRoleKey!);
+    
+    // Generate cache key from search parameters
+    const cacheKey = `ebay_${category}_${searchQuery || upc || epid}_${condition || 'any'}`;
+    
+    // Check cache first
+    const { data: cachedData, error: cacheError } = await supabase
+      .from('api_cache')
+      .select('response_data, expires_at')
+      .eq('cache_key', cacheKey)
+      .gt('expires_at', new Date().toISOString())
+      .maybeSingle();
+
+    if (cachedData && !cacheError) {
+      console.log(`Cache HIT: ${cacheKey} (expires: ${cachedData.expires_at})`);
+      return new Response(
+        JSON.stringify({
+          ...cachedData.response_data,
+          cached: true,
+          cached_until: cachedData.expires_at
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log(`Cache MISS: ${cacheKey} - Fetching from eBay API`);
+    
     // Get minimum price for this category (Layer 1 filtering)
     const minPrice = getMinPrice(category);
 
     // Get OAuth token from ebay-auth function
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     
     const authResponse = await fetch(
       `${supabaseUrl}/functions/v1/ebay-auth`,
@@ -255,21 +298,38 @@ serve(async (req) => {
     const statistics = calculateStatistics(filteredItems);
     console.log(`Statistics - Avg: $${statistics.average.toFixed(2)}, Min: $${statistics.min}, Max: $${statistics.max}, Median: $${statistics.median}`);
     
+    // Prepare response data
+    const responseData = {
+      success: true,
+      query: searchQuery || upc || epid,
+      category: category,
+      raw_count: rawItems.length,
+      filtered_count: filteredItems.length,
+      items: filteredItems,
+      statistics: statistics,
+      filters_applied: {
+        min_price: minPrice,
+        parts_keywords_checked: true,
+        price_threshold: minPrice * 0.5
+      }
+    };
+    
+    // Store in cache
+    const cacheTTL = CACHE_TTL_HOURS[category] || 48;
+    const expiresAt = new Date(Date.now() + cacheTTL * 60 * 60 * 1000);
+    
+    await supabase
+      .from('api_cache')
+      .upsert({
+        cache_key: cacheKey,
+        response_data: responseData,
+        expires_at: expiresAt.toISOString()
+      });
+    
+    console.log(`Cached result until ${expiresAt.toISOString()} (TTL: ${cacheTTL} hours)`);
+    
     return new Response(
-      JSON.stringify({
-        success: true,
-        query: searchQuery || upc || epid,
-        category: category,
-        raw_count: rawItems.length,
-        filtered_count: filteredItems.length,
-        items: filteredItems,
-        statistics: statistics,
-        filters_applied: {
-          min_price: minPrice,
-          parts_keywords_checked: true,
-          price_threshold: minPrice * 0.5
-        }
-      }),
+      JSON.stringify({ ...responseData, cached: false }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
     

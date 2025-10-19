@@ -17,10 +17,10 @@ import {
   DollarSign,
   Save,
   Brain,
-  Zap,
-  TrendingUp
+  Zap
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ValuationInsights } from '@/components/ValuationInsights';
 
 interface AssetForm {
   title: string;
@@ -153,8 +153,12 @@ export default function EditAsset() {
 
       setValuationResult(result);
       
+      const dataSourceLabel = result.data_source === 'ebay' ? 'eBay Market Data' : 
+                             result.data_source === 'hybrid' ? 'Hybrid Data' : 
+                             'AI Estimate';
+      
       toast({
-        title: "AI Valuation Complete",
+        title: `Valuation Complete - ${dataSourceLabel}`,
         description: `Estimated value: $${result.estimated_value} (${result.confidence}% confidence)`,
       });
 
@@ -517,38 +521,41 @@ export default function EditAsset() {
                       className="pl-10"
                     />
                   </div>
-                  {valuationResult && (
-                    <div className="p-3 bg-muted rounded-lg space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <TrendingUp className="h-4 w-4 text-primary" />
-                          <span className="font-medium">AI Valuation</span>
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          {valuationResult.confidence}% confidence
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span>Estimated Value:</span>
-                          <span className="font-semibold">${valuationResult.estimated_value}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span>Range:</span>
-                          <span>${valuationResult.value_range.min} - ${valuationResult.value_range.max}</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">{valuationResult.reasoning}</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" onClick={acceptAIValuation}>
-                          Accept Value
-                        </Button>
-                        <Button size="sm" variant="outline" onClick={() => setValuationResult(null)}>
-                          Dismiss
-                        </Button>
-                      </div>
-                    </div>
-                  )}
+                </div>
+              </div>
+
+              {/* Valuation Insights Display */}
+              {valuationResult && (
+                <div className="space-y-4">
+                  <ValuationInsights valuation={valuationResult} />
+                  <div className="flex gap-2">
+                    <Button size="sm" onClick={acceptAIValuation}>
+                      Accept Value
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => setValuationResult(null)}>
+                      Dismiss
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <Label htmlFor="purchase_price">Purchase Price</Label>
+                  <div className="relative">
+                    <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                    <Input
+                      id="purchase_price"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="999999999"
+                      value={formData.purchase_price}
+                      onChange={(e) => setFormData({...formData, purchase_price: e.target.value})}
+                      placeholder="0.00"
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
                 
                 <div className="space-y-2">

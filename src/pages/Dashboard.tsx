@@ -77,6 +77,14 @@ export default function Dashboard() {
   const itemsPerPage = 12;
   const [showJumpstart, setShowJumpstart] = useState(true);
 
+  // Check if user previously skipped jumpstart
+  useEffect(() => {
+    const skipped = localStorage.getItem('jumpstart_skipped');
+    if (skipped === 'true') {
+      setShowJumpstart(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (user) {
       setLoading(true);
@@ -320,7 +328,17 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col sm:flex-row gap-4">
-            <Button asChild>
+            <Button 
+              onClick={() => {
+                localStorage.removeItem('jumpstart_skipped');
+                setShowJumpstart(true);
+              }}
+              className="flex items-center"
+            >
+              <Camera className="mr-2 h-4 w-4" />
+              Try Jumpstart Guide
+            </Button>
+            <Button asChild variant="outline">
               <Link to="/properties">
                 <Home className="mr-2 h-4 w-4" />
                 Add Property
@@ -328,8 +346,8 @@ export default function Dashboard() {
             </Button>
             <Button asChild variant="outline">
               <Link to="/assets/add">
-                <Camera className="mr-2 h-4 w-4" />
-                Scan First Asset
+                <Plus className="mr-2 h-4 w-4" />
+                Add Asset Manually
               </Link>
             </Button>
           </CardContent>

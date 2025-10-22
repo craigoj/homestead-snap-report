@@ -1,4 +1,4 @@
-import { LucideIcon } from 'lucide-react';
+import { LucideIcon, Zap, Trophy, Home } from 'lucide-react';
 
 export interface Prompt {
   id: string;
@@ -217,6 +217,43 @@ export const ROOM_BLITZ_PROMPTS: Prompt[] = [
   }
 ];
 
+// Jumpstart Modes Configuration
+export const JUMPSTART_MODES: JumpstartMode[] = [
+  {
+    id: 'quick-win',
+    name: 'Quick Win',
+    description: 'Perfect for getting started',
+    time: '3 minutes',
+    items: 3,
+    value: '$2,000-5,000',
+    icon: Zap,
+    popular: true,
+    prompts: QUICK_WIN_PROMPTS
+  },
+  {
+    id: 'high-value',
+    name: 'High-Value Hunt',
+    description: 'Focus on expensive items',
+    time: '5 minutes',
+    items: 5,
+    value: '$5,000-15,000',
+    icon: Trophy,
+    popular: false,
+    prompts: HIGH_VALUE_PROMPTS
+  },
+  {
+    id: 'room-blitz',
+    name: 'Room Blitz',
+    description: 'Complete one room',
+    time: '10 minutes',
+    items: 15,
+    value: '$10,000-30,000',
+    icon: Home,
+    popular: false,
+    prompts: ROOM_BLITZ_PROMPTS
+  }
+];
+
 // Helper function to get prompts for a specific mode
 export function getPromptsForMode(modeId: string): Prompt[] {
   switch (modeId) {
@@ -233,6 +270,5 @@ export function getPromptsForMode(modeId: string): Prompt[] {
 
 // Helper function to get mode by ID
 export function getModeById(modeId: string): JumpstartMode | null {
-  // This will be populated when we update the mode selector
-  return null;
+  return JUMPSTART_MODES.find(mode => mode.id === modeId) || null;
 }

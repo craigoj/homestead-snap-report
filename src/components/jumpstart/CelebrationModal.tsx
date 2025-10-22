@@ -76,15 +76,26 @@ export const CelebrationModal = ({
             </p>
           </div>
 
-          {/* Value Display */}
-          <div className="bg-success/10 border border-success/20 rounded-lg p-4">
-            <div className="text-2xl font-bold text-success">
-              ${estimatedValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          {/* Value Display - Conditional based on whether we have a value */}
+          {estimatedValue && estimatedValue > 0 ? (
+            <div className="bg-success/10 border border-success/20 rounded-lg p-4">
+              <div className="text-2xl font-bold text-success">
+                ${estimatedValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+              <div className="text-sm text-muted-foreground mt-1">
+                Item value added
+              </div>
             </div>
-            <div className="text-sm text-muted-foreground mt-1">
-              Item value added
+          ) : (
+            <div className="bg-muted/50 border border-border rounded-lg p-4">
+              <div className="text-lg text-muted-foreground italic">
+                Calculating value...
+              </div>
+              <div className="text-sm text-muted-foreground mt-1">
+                Value estimation in progress
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Running Total */}
           <div className="space-y-2">

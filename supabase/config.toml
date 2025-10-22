@@ -37,7 +37,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.send-email]
-verify_jwt = false
+verify_jwt = true
 
 [functions.generate-proof-of-loss]
 verify_jwt = true

@@ -545,7 +545,7 @@ export type Database = {
           ocr_hints: Json | null
           serial_number_patterns: string[] | null
           subcategory: string | null
-          typical_value_range: unknown | null
+          typical_value_range: unknown
           updated_at: string
         }
         Insert: {
@@ -559,7 +559,7 @@ export type Database = {
           ocr_hints?: Json | null
           serial_number_patterns?: string[] | null
           subcategory?: string | null
-          typical_value_range?: unknown | null
+          typical_value_range?: unknown
           updated_at?: string
         }
         Update: {
@@ -573,7 +573,7 @@ export type Database = {
           ocr_hints?: Json | null
           serial_number_patterns?: string[] | null
           subcategory?: string | null
-          typical_value_range?: unknown | null
+          typical_value_range?: unknown
           updated_at?: string
         }
         Relationships: []
@@ -1164,7 +1164,7 @@ export type Database = {
     }
     Functions: {
       get_valid_ebay_token: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           access_token: string
           expires_at: string
@@ -1186,10 +1186,7 @@ export type Database = {
         }
         Returns: string
       }
-      should_revalue_asset: {
-        Args: { p_asset_id: string }
-        Returns: boolean
-      }
+      should_revalue_asset: { Args: { p_asset_id: string }; Returns: boolean }
       upsert_ebay_token: {
         Args: {
           p_access_token: string

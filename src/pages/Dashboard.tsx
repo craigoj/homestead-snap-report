@@ -331,7 +331,7 @@ export default function Dashboard() {
             <Button 
               onClick={() => {
                 localStorage.removeItem('jumpstart_skipped');
-                setShowJumpstart(true);
+                navigate('/jumpstart');
               }}
               className="flex items-center"
             >

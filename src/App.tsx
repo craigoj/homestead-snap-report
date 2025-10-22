@@ -35,6 +35,7 @@ import Unsubscribe from "./pages/Unsubscribe";
 import ProofOfLoss from "./pages/ProofOfLoss";
 import JumpstartGuide from "./pages/JumpstartGuide";
 import JumpstartComplete from "./pages/JumpstartComplete";
+import JumpstartMode from "./pages/JumpstartMode";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -115,6 +116,13 @@ const App = () => {
                 <Route path="/proof-of-loss" element={
                   <ProtectedRoute>
                     <ProofOfLoss />
+                  </ProtectedRoute>
+                } />
+                <Route path="/jumpstart" element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <JumpstartMode />
+                    </Layout>
                   </ProtectedRoute>
                 } />
                 <Route path="/jumpstart/guide" element={

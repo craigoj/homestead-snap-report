@@ -17,7 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useJumpstartSession } from '@/hooks/useJumpstartSession';
 import { toast } from '@/hooks/use-toast';
-import { getPromptsForMode } from '@/lib/jumpstart/prompts';
+import { getPromptsForMode, inferCategoryFromPrompt } from '@/lib/jumpstart/prompts';
 import { parseMoney, parseConfidence } from '@/lib/numberUtils';
 import { 
   Camera, 
@@ -106,6 +106,17 @@ export default function AddAsset() {
       return () => clearTimeout(timer);
     }
   }, [isJumpstart, formData.title, formData.category]);
+
+  // Auto-set category from prompt in jumpstart mode
+  useEffect(() => {
+    if (isJumpstart && currentPrompt && !formData.category) {
+      const suggestedCategory = inferCategoryFromPrompt(currentPrompt.id);
+      setFormData(prev => ({
+        ...prev,
+        category: suggestedCategory
+      }));
+    }
+  }, [isJumpstart, currentPrompt, formData.category]);
 
   const handlePhotoUpload = async (photos: string[]) => {
     setUploadedPhotos(photos);
@@ -627,6 +638,12 @@ export default function AddAsset() {
               
               <div className="space-y-2">
                 <Label htmlFor="category">Category</Label>
+                {isJumpstart && currentPrompt && formData.category && (
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Zap className="h-3 w-3 text-primary" />
+                    Auto-suggested based on "{currentPrompt.item}"
+                  </p>
+                )}
                 <Select value={formData.category} onValueChange={(value) => 
                   setFormData({...formData, category: value})
                 }>

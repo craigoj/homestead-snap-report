@@ -272,3 +272,41 @@ export function getPromptsForMode(modeId: string): Prompt[] {
 export function getModeById(modeId: string): JumpstartMode | null {
   return JUMPSTART_MODES.find(mode => mode.id === modeId) || null;
 }
+
+/**
+ * Infer asset category from a jumpstart prompt
+ */
+export function inferCategoryFromPrompt(promptId: string): string {
+  const categoryMap: Record<string, string> = {
+    // Quick Win prompts
+    'quick-win-tv': 'electronics',
+    'quick-win-laptop': 'electronics',
+    'quick-win-jewelry': 'jewelry',
+    
+    // High Value prompts
+    'high-value-electronics': 'electronics',
+    'high-value-appliances': 'appliances',
+    'high-value-tools': 'tools',
+    'high-value-audio': 'electronics',
+    'high-value-designer': 'clothing',
+    
+    // Room Blitz prompts
+    'room-blitz-bed': 'furniture',
+    'room-blitz-nightstands': 'furniture',
+    'room-blitz-dresser': 'furniture',
+    'room-blitz-tv': 'electronics',
+    'room-blitz-laptop': 'electronics',
+    'room-blitz-phone': 'electronics',
+    'room-blitz-jewelry': 'jewelry',
+    'room-blitz-watch': 'jewelry',
+    'room-blitz-shoes': 'clothing',
+    'room-blitz-clothing': 'clothing',
+    'room-blitz-bags': 'clothing',
+    'room-blitz-mirror': 'furniture',
+    'room-blitz-lamp': 'electronics',
+    'room-blitz-art': 'art',
+    'room-blitz-gaming': 'electronics'
+  };
+  
+  return categoryMap[promptId] || 'other';
+}

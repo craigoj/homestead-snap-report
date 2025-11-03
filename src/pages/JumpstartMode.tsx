@@ -3,6 +3,7 @@ import { JumpstartModeSelector } from '@/components/jumpstart/JumpstartModeSelec
 import { getModeById } from '@/lib/jumpstart/prompts';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { safeLocalStorage } from '@/lib/storage';
 import { toast } from 'sonner';
 
 export default function JumpstartMode() {
@@ -49,7 +50,7 @@ export default function JumpstartMode() {
   };
 
   const handleSkip = () => {
-    localStorage.setItem('jumpstart_skipped', 'true');
+    safeLocalStorage.setItem('jumpstart_skipped', 'true');
     navigate('/dashboard');
   };
 

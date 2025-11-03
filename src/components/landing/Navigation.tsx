@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Shield, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,10 +11,14 @@ export const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showDemoModal, setShowDemoModal] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = scrollHeight > 0 ? (window.scrollY / scrollHeight) * 100 : 0;
+      setScrollProgress(Math.min(100, progress));
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -37,10 +43,10 @@ export const Navigation = () => {
         }`}
       >
         {/* Scroll progress indicator */}
-        <div 
+        <div
           className="absolute bottom-0 left-0 h-0.5 bg-gradient-primary transition-all duration-300"
           style={{
-            width: `${Math.min(100, (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100)}%`
+            width: `${scrollProgress}%`
           }}
         />
         

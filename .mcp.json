@@ -1,0 +1,91 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=hfiznpxdopjdwtuenxqf",
+      "metadata": {
+        "description": "Supabase MCP server for SnapAsset AI project",
+        "priority": "P1",
+        "status": "active",
+        "capabilities": [
+          "Database schema management",
+          "SQL queries and data access",
+          "Migration generation",
+          "TypeScript type generation",
+          "Documentation search"
+        ]
+      }
+    },
+    "github": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "metadata": {
+        "description": "GitHub integration for version control and collaboration",
+        "priority": "P1",
+        "status": "ready_to_configure",
+        "repository": "craigoj/homestead-snap-report",
+        "capabilities": [
+          "Issue management",
+          "Pull request creation and review",
+          "Branch management",
+          "Commit history queries",
+          "GitHub Actions workflow management"
+        ]
+      }
+    },
+    "filesystem": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/craigj/Documents/snapassetai/src",
+        "/Users/craigj/Documents/snapassetai/supabase"
+      ],
+      "metadata": {
+        "description": "Enhanced file system operations for src and supabase directories",
+        "priority": "P1",
+        "status": "ready_to_configure",
+        "capabilities": [
+          "Advanced file search",
+          "Batch file operations",
+          "Safe file manipulation",
+          "Directory tree visualization"
+        ]
+      }
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@executeautomation/playwright-mcp-server"
+      ],
+      "metadata": {
+        "description": "Browser automation with Playwright for testing and web scraping",
+        "priority": "P2",
+        "status": "active",
+        "capabilities": [
+          "Browser automation (Chrome, Firefox, Safari)",
+          "Web scraping and data extraction",
+          "Screenshot and PDF generation",
+          "Form filling and interaction",
+          "Network request interception",
+          "Mobile device emulation",
+          "E2E testing automation"
+        ],
+        "use_cases": [
+          "Automated testing of SnapAsset AI web app",
+          "eBay price scraping and validation",
+          "Screenshot generation for documentation",
+          "Form submission testing",
+          "Authentication flow testing"
+        ]
+      }
+    }
+  }
+}

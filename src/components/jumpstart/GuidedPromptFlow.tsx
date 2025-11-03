@@ -1,5 +1,7 @@
+'use client'
+
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { Camera, X, Lightbulb, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -15,7 +17,7 @@ interface GuidedPromptFlowProps {
 }
 
 export const GuidedPromptFlow = ({ mode, onComplete, onSkip }: GuidedPromptFlowProps) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { 
     session, 
     currentPrompt, 
@@ -49,8 +51,8 @@ export const GuidedPromptFlow = ({ mode, onComplete, onSkip }: GuidedPromptFlowP
 
   const handleStartScan = () => {
     if (!session) return;
-    
-    navigate(`/assets/add?jumpstart=true&mode=${mode.id}&prompt=${currentPromptIndex + 1}&sessionId=${session.id}`);
+
+    router.push(`/assets/add?jumpstart=true&mode=${mode.id}&prompt=${currentPromptIndex + 1}&sessionId=${session.id}`);
   };
 
   const handleSkipPrompt = async () => {

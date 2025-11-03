@@ -1,12 +1,15 @@
+'use client'
+
 import { ReactNode, useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { Home, Shield, Package, Plus, FileText, Settings, LogOut, Menu, Database, UserCog, BarChart3, Users } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase/client';
 import { Separator } from '@/components/ui/separator';
 
 interface LayoutProps {
@@ -29,7 +32,7 @@ const adminNavigation = [
 
 export const Layout = ({ children }: LayoutProps) => {
   const { user, signOut } = useAuth();
-  const location = useLocation();
+  const pathname = usePathname();
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -59,11 +62,11 @@ export const Layout = ({ children }: LayoutProps) => {
   const NavLinks = () => (
     <>
       {navigation.map((item) => {
-        const isActive = location.pathname === item.href;
+        const isActive = pathname === item.href;
         return (
           <Link
             key={item.name}
-            to={item.href}
+            href={item.href}
             className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
               isActive
                 ? 'bg-primary text-primary-foreground'
@@ -85,11 +88,11 @@ export const Layout = ({ children }: LayoutProps) => {
             </p>
           </div>
           {adminNavigation.map((item) => {
-            const isActive = location.pathname === item.href;
+            const isActive = pathname === item.href;
             return (
               <Link
                 key={item.name}
-                to={item.href}
+                href={item.href}
                 className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive
                     ? 'bg-primary text-primary-foreground'

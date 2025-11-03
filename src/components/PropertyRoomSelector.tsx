@@ -1,12 +1,14 @@
+'use client'
+
 import { useState, useEffect } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Home, Plus } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 interface Property {
   id: string;
@@ -36,7 +38,7 @@ export const PropertyRoomSelector = ({
   allowEmpty = false
 }: PropertyRoomSelectorProps) => {
   const { user } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [properties, setProperties] = useState<Property[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,10 +70,8 @@ export const PropertyRoomSelector = ({
       if (error) throw error;
       setProperties(data || []);
     } catch (error: any) {
-      toast({
-        title: "Error Loading Properties",
-        description: error.message,
-        variant: "destructive",
+      toast.error("Error Loading Properties", {
+        description: error.message
       });
     } finally {
       setLoading(false);
@@ -89,10 +89,8 @@ export const PropertyRoomSelector = ({
       if (error) throw error;
       setRooms(data || []);
     } catch (error: any) {
-      toast({
-        title: "Error Loading Rooms",
-        description: error.message,
-        variant: "destructive",
+      toast.error("Error Loading Rooms", {
+        description: error.message
       });
     }
   };
@@ -133,7 +131,7 @@ export const PropertyRoomSelector = ({
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => navigate('/properties')}
+              onClick={() => router.push('/properties')}
             >
               <Plus className="mr-2 h-4 w-4" />
               Add Property
@@ -194,7 +192,7 @@ export const PropertyRoomSelector = ({
               <Button 
                 variant="link" 
                 className="p-0 h-auto text-xs"
-                onClick={() => navigate('/properties')}
+                onClick={() => router.push('/properties')}
               >
                 Add rooms in Properties
               </Button>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { GuidedPromptFlow } from '@/components/jumpstart/GuidedPromptFlow';
 import { getPromptsForMode } from '@/lib/jumpstart/prompts';
+import { safeLocalStorage } from '@/lib/storage';
 import { Zap, Trophy, Home } from 'lucide-react';
 
 export default function JumpstartGuide() {
@@ -57,7 +58,7 @@ export default function JumpstartGuide() {
   };
 
   const handleSkip = () => {
-    localStorage.setItem('jumpstart_skipped', 'true');
+    safeLocalStorage.setItem('jumpstart_skipped', 'true');
     navigate('/dashboard');
   };
 

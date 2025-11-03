@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ArrowRight, CheckCircle, Star, Users, DollarSign, Clock, Play, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { safeLocalStorage } from '@/lib/storage';
 import { DemoModal } from './DemoModal';
 
 export const HeroSection = () => {
@@ -130,7 +131,7 @@ export const HeroSection = () => {
                     onClick={async () => {
                       setIsSubmitting(true);
                       if (email) {
-                        localStorage.setItem('snapassetai-email', email);
+                        safeLocalStorage.setItem('snapassetai-email', email);
                       }
                       // Add slight delay for better UX
                       await new Promise(resolve => setTimeout(resolve, 500));

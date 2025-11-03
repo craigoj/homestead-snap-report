@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase/client';
 import { useAuth } from './useAuth';
 import { JumpstartMode, Prompt, getPromptsForMode } from '@/lib/jumpstart/prompts';
 import { toast } from 'sonner';

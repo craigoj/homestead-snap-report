@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { safeLocalStorage } from '@/lib/storage';
 import { toast } from '@/hooks/use-toast';
 import { AssetCard } from '@/components/AssetCard';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -79,7 +80,7 @@ export default function Dashboard() {
 
   // Check if user previously skipped jumpstart
   useEffect(() => {
-    const skipped = localStorage.getItem('jumpstart_skipped');
+    const skipped = safeLocalStorage.getItem('jumpstart_skipped');
     if (skipped === 'true') {
       setShowJumpstart(false);
     }
@@ -313,7 +314,7 @@ export default function Dashboard() {
               }}
               onSkip={() => {
                 setShowJumpstart(false);
-                localStorage.setItem('jumpstart_skipped', 'true');
+                safeLocalStorage.setItem('jumpstart_skipped', 'true');
               }}
             />
           )}
@@ -328,9 +329,9 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col sm:flex-row gap-4">
-            <Button 
+            <Button
               onClick={() => {
-                localStorage.removeItem('jumpstart_skipped');
+                safeLocalStorage.removeItem('jumpstart_skipped');
                 navigate('/jumpstart');
               }}
               className="flex items-center"

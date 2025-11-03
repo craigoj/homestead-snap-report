@@ -1,14 +1,13 @@
 [build]
-  command = "npm run build"
-  publish = "dist"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+  command = "npm run build:next"
+  publish = ".next"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
+
+# Essential Next.js Runtime Plugin
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
 
 # Prerendering plugin for better SEO
 [[plugins]]

@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { supabase } from '@/lib/supabase/client'
 import { useAuth } from '@/hooks/useAuth'
+import { useDebounce } from '@/hooks/useDebounce'
 import { safeLocalStorage } from '@/lib/storage'
 import { toast } from 'sonner'
 import { AssetCard } from '@/components/AssetCard'
@@ -73,6 +74,7 @@ export default function DashboardPage() {
   const [lossEvents, setLossEvents] = useState<LossEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const debouncedSearchTerm = useDebounce(searchTerm, 300)
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [sortBy, setSortBy] = useState<'created_at' | 'title' | 'estimated_value'>('created_at')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
@@ -95,7 +97,7 @@ export default function DashboardPage() {
       fetchDashboardData()
       fetchLossEvents()
     }
-  }, [user, searchTerm, categoryFilter, sortBy, sortOrder, currentPage])
+  }, [user, debouncedSearchTerm, categoryFilter, sortBy, sortOrder, currentPage])
 
   const fetchDashboardData = async () => {
     try {
@@ -115,8 +117,8 @@ export default function DashboardPage() {
         `, { count: 'exact' })
 
       // Apply filters
-      if (searchTerm) {
-        query = query.ilike('title', `%${searchTerm}%`)
+      if (debouncedSearchTerm) {
+        query = query.ilike('title', `%${debouncedSearchTerm}%`)
       }
       if (categoryFilter !== 'all') {
         query = query.eq('category', categoryFilter as any)

@@ -8,30 +8,30 @@
 ## 🔐 AUTHENTICATION TESTING
 
 ### Sign Up Flow
-- [ ] Visit http://localhost:3000/auth
-- [ ] Click "Sign Up" tab
-- [ ] Enter test email and password
-- [ ] Check for validation errors (if any)
-- [ ] Verify account creation success message
-- [ ] Check email for confirmation link (if email is configured)
+- [x ] Visit http://localhost:3000/auth
+- [ x] Click "Sign Up" tab
+- [x ] Enter test email and password
+- [x ] Check for validation errors (if any)
+- [x ] Verify account creation success message
+- [ Need to add this] Check email for confirmation link (if email is configured)
 
 ### Sign In Flow
-- [ ] Visit http://localhost:3000/auth
-- [ ] Enter valid credentials
-- [ ] Click "Sign In"
-- [ ] Verify redirect to /dashboard
-- [ ] Check that user name appears in UI
+- [x ] Visit http://localhost:3000/auth
+- [x ] Enter valid credentials
+- [x ] Click "Sign In"
+- [x ] Verify redirect to /dashboard
+- [x ] Check that user name appears in UI
 
 ### Magic Link (Optional)
-- [ ] Click "Send magic link" option
+- [Need to set this up ] Click "Send magic link" option
 - [ ] Enter email address
 - [ ] Verify success message
 - [ ] Check email for magic link
 
 ### Sign Out
-- [ ] Click profile/user menu
-- [ ] Click "Sign Out"
-- [ ] Verify redirect to landing page
+- [ x] Click profile/user menu
+- [ x] Click "Sign Out"
+- [ does redirect to landing page] Verify redirect to landing page
 - [ ] Confirm session cleared
 
 ---
@@ -39,25 +39,25 @@
 ## 🏠 DASHBOARD & NAVIGATION
 
 ### Dashboard Page (http://localhost:3000/dashboard)
-- [ ] Stats cards display correctly (Total Assets, Total Value, Properties, Coverage)
-- [ ] "Add Asset" button visible and clickable
-- [ ] Search bar works
-- [ ] Category filter dropdown works
-- [ ] Sort buttons work (Date, Value)
-- [ ] Asset cards display with images
-- [ ] Pagination works (if >12 assets)
-- [ ] No console errors
+- [x ] Stats cards display correctly (Total Assets, Total Value, Properties, Coverage)
+- [ x] "Add Asset" button visible and clickable
+- [ search bar works but it only allow for on character at a time] Search bar works
+- [ x] Category filter dropdown works
+- [ x] Sort buttons work (Date, Value)
+- [ x] Asset cards display with images
+- [ x] Pagination works (if >12 assets)
+- [ x] No console errors
 
 ### Navigation
-- [ ] Click all main menu items:
-  - [ ] Dashboard
-  - [ ] Properties
-  - [ ] Reports
-  - [ ] Bulk Operations
-  - [ ] Settings/Profile
-- [ ] All pages load without errors
-- [ ] Back button works correctly
-- [ ] URLs are correct (no #hash routes)
+- [ x] Click all main menu items:
+  - [x ] Dashboard
+  - [ x] Properties
+  - [ x] Reports
+  - [ x] Bulk Operations
+  - [ Didn't see this] Settings/Profile
+- [x ] All pages load without errors
+- [No back button or nav bar ] Back button works correctly
+- [ x] URLs are correct (no #hash routes)
 
 ---
 

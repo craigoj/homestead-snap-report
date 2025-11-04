@@ -5,12 +5,13 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'
-import { Home, Shield, Package, Plus, FileText, LogOut, Menu, Database, UserCog, BarChart3, Users } from 'lucide-react'
+import { Home, Shield, Package, Plus, FileText, LogOut, Menu, Database, UserCog, BarChart3, Users, Settings } from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { createClient } from '@/lib/supabase/client'
 import { Separator } from '@/components/ui/separator'
+import { Breadcrumb } from '@/components/Breadcrumb'
 
 interface DashboardShellProps {
   children: ReactNode
@@ -22,6 +23,7 @@ const navigation = [
   { name: 'Add Asset', href: '/assets/add', icon: Plus },
   { name: 'Reports', href: '/reports', icon: FileText },
   { name: 'Bulk Operations', href: '/bulk-operations', icon: Database },
+  { name: 'Settings', href: '/settings', icon: Settings },
 ]
 
 const adminNavigation = [
@@ -207,6 +209,7 @@ export const DashboardShell = ({ children }: DashboardShellProps) => {
       <div className="md:pl-64">
         <main className="py-6">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
+            <Breadcrumb />
             {children}
           </div>
         </main>

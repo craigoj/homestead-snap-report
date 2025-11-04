@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Layout } from '@/components/Layout';
 import { Card } from '@/components/ui/card';
@@ -11,10 +11,10 @@ import { Label } from '@/components/ui/label';
 import { SignatureCapture } from '@/components/SignatureCapture';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase/client';
-import { ArrowLeft, ArrowRight, FileText } from 'lucide-react';
+import { ArrowLeft, ArrowRight, FileText, Loader2 } from 'lucide-react';
 import { toast as sonnerToast } from 'sonner';
 
-const ProofOfLoss = () => {
+const ProofOfLossContent = () => {
   const searchParams = useSearchParams();
   const eventId = searchParams.get('eventId');
   const router = useRouter();
@@ -211,4 +211,16 @@ const ProofOfLoss = () => {
   );
 };
 
-export default ProofOfLoss;
+export default function ProofOfLoss() {
+  return (
+    <Suspense fallback={
+      <Layout>
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </Layout>
+    }>
+      <ProofOfLossContent />
+    </Suspense>
+  );
+}

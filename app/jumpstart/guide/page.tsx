@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GuidedPromptFlow } from '@/components/jumpstart/GuidedPromptFlow';
 import { getPromptsForMode } from '@/lib/jumpstart/prompts';
 import { safeLocalStorage } from '@/lib/storage';
-import { Zap, Trophy, Home } from 'lucide-react';
+import { Zap, Trophy, Home, Loader2 } from 'lucide-react';
 
-export default function JumpstartGuide() {
+function JumpstartGuideContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const modeParam = searchParams.get('mode') || 'quick-win';
@@ -70,5 +70,17 @@ export default function JumpstartGuide() {
       onComplete={handleComplete}
       onSkip={handleSkip}
     />
+  );
+}
+
+export default function JumpstartGuide() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    }>
+      <JumpstartGuideContent />
+    </Suspense>
   );
 }

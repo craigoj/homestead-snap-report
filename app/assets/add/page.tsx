@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,7 +32,8 @@ import {
   Brain,
   TrendingUp,
   CheckCircle,
-  Edit
+  Edit,
+  Loader2
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -58,7 +59,7 @@ const categories = [
 
 const conditions = ['excellent', 'good', 'fair', 'poor'];
 
-export default function AddAsset() {
+function AddAssetContent() {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -824,5 +825,19 @@ export default function AddAsset() {
         />
       )}
     </div>
+  );
+}
+
+export default function AddAsset() {
+  return (
+    <Suspense fallback={
+      <div className="space-y-6">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </div>
+    }>
+      <AddAssetContent />
+    </Suspense>
   );
 }

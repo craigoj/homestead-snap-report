@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Navigation } from '@/components/landing/Navigation';
 import { Footer } from '@/components/landing/Footer';
@@ -9,10 +9,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { CheckCircle, Mail } from 'lucide-react';
+import { CheckCircle, Mail, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const Unsubscribe = () => {
+const UnsubscribeContent = () => {
   const searchParams = useSearchParams();
   const email = searchParams.get('email');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -244,4 +244,18 @@ const Unsubscribe = () => {
   );
 };
 
-export default Unsubscribe;
+export default function Unsubscribe() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="container mx-auto px-4 py-16 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </main>
+        <Footer />
+      </div>
+    }>
+      <UnsubscribeContent />
+    </Suspense>
+  );
+}

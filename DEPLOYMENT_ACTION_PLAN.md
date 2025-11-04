@@ -93,6 +93,20 @@ Your SnapAsset AI application is **95% production-ready**. All code fixes are co
      - **Secret key** (starts with sk_live_) → `STRIPE_SECRET_KEY`
 
 3. **Create Webhook Endpoint:**
+
+   **Option A: Using Stripe CLI (Recommended - Faster & Easier)**
+   → See `STRIPE_WEBHOOK_CLI_GUIDE.md` for step-by-step instructions
+
+   Quick summary:
+   ```bash
+   stripe login
+   stripe webhooks create \
+     --url https://snapassetai.com/api/stripe/webhook \
+     --events checkout.session.completed,customer.subscription.created,customer.subscription.updated,customer.subscription.deleted,invoice.payment_succeeded,invoice.payment_failed
+   ```
+   Then copy the `whsec_` secret from the output → `STRIPE_WEBHOOK_SECRET`
+
+   **Option B: Using Stripe Dashboard**
    - Go to **Developers → Webhooks**
    - Click "Add an endpoint"
    - **Endpoint URL:** `https://snapassetai.com/api/stripe/webhook` (replace with your actual domain!)
@@ -399,6 +413,7 @@ If you get stuck, these resources will help:
 - `PRODUCTION_DEPLOYMENT.md` - Detailed deployment guide
 - `NETLIFY_CLI_GUIDE.md` - Using Netlify CLI for advanced deployments
 - `STRIPE_SETUP.md` - Complete Stripe integration guide
+- `STRIPE_WEBHOOK_CLI_GUIDE.md` - Using Stripe CLI for webhook setup (recommended!)
 - `SUPABASE_LOCAL_GUIDE.md` - Supabase setup and troubleshooting
 
 **External Documentation:**

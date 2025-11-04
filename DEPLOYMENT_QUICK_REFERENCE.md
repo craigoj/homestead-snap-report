@@ -18,7 +18,15 @@
   ├─ Toggle OFF "View test data" (switch to Live)
   ├─ Copy pk_live_... → NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   ├─ Copy sk_live_... → STRIPE_SECRET_KEY
-  ├─ Go to Developers → Webhooks
+
+□ Stripe Webhook Secret (Choose Option)
+  Option A (CLI - Recommended):
+  ├─ stripe login
+  ├─ stripe webhooks create --url https://snapassetai.com/api/stripe/webhook --events checkout.session.completed,customer.subscription.created,customer.subscription.updated,customer.subscription.deleted,invoice.payment_succeeded,invoice.payment_failed
+  └─ Copy whsec_... → STRIPE_WEBHOOK_SECRET
+
+  Option B (Dashboard):
+  ├─ Go to: https://dashboard.stripe.com/webhooks
   ├─ Add endpoint: https://snapassetai.com/api/stripe/webhook
   └─ Copy whsec_... → STRIPE_WEBHOOK_SECRET
 ```
@@ -145,7 +153,8 @@ Verification (5 min):
 1. Check `DEPLOYMENT_ACTION_PLAN.md` (full guide with explanations)
 2. Check `PRODUCTION_ENV_CHECKLIST.md` (complete variable reference)
 3. Check `PRODUCTION_DEPLOYMENT.md` (detailed deployment guide)
-4. Review troubleshooting section in `DEPLOYMENT_ACTION_PLAN.md`
+4. Check `STRIPE_WEBHOOK_CLI_GUIDE.md` (for webhook setup help)
+5. Review troubleshooting section in `DEPLOYMENT_ACTION_PLAN.md`
 
 ---
 

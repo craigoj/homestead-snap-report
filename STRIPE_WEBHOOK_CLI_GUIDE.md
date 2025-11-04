@@ -8,56 +8,49 @@
 
 ## Step 1: Install Stripe CLI
 
-### macOS (Intel or Apple Silicon)
+**⚠️ For Detailed Instructions:** See `STRIPE_CLI_INSTALL_MANUAL.md`
 
-**Option A: Using Homebrew (Recommended if you have brew)**
+This guide covers:
+- Installation for macOS, Windows, and Linux
+- Multiple installation methods for each OS
+- Troubleshooting common issues
+- Step-by-step verification
+
+### Quick Installation
+
+**macOS (with Homebrew):**
 ```bash
 brew install stripe/stripe-cli/stripe
 ```
 
-**Option B: Direct Download (If Homebrew not available)**
+**macOS (without Homebrew - Recommended):**
 ```bash
-# Download the latest version
-curl https://files.stripe.com/stripe-cli/releases/latest/mac/stripe_mac.zip -o stripe_mac.zip
+# Apple Silicon (M1/M2/M3):
+curl -L https://github.com/stripe/stripe-cli/releases/download/v1.18.0/stripe_1.18.0_mac_arm64.zip -o stripe_mac.zip
 
-# Unzip it
+# Intel Mac:
+curl -L https://github.com/stripe/stripe-cli/releases/download/v1.18.0/stripe_1.18.0_mac_x86_64.zip -o stripe_mac.zip
+
+# Then:
 unzip stripe_mac.zip
-
-# Move to /usr/local/bin so it's in your PATH
 sudo mv stripe /usr/local/bin/stripe
-
-# Verify installation
 stripe --version
 ```
 
-**Option C: Manual Download**
-1. Go to https://github.com/stripe/stripe-cli/releases
-2. Download the latest `stripe_mac.zip` (Intel) or `stripe_linux_arm64.zip` (Apple Silicon)
-3. Unzip and move to `/usr/local/bin/` or add to your PATH
-
-### Windows
-```bash
-# Using chocolatey
+**Windows (Chocolatey):**
+```powershell
 choco install stripe-cli
-
-# Or download from:
-# https://github.com/stripe/stripe-cli/releases
 ```
 
-### Linux
+**Linux (Debian/Ubuntu):**
 ```bash
-# Debian/Ubuntu
-sudo apt-get install curl
-curl https://files.stripe.com/stripe-cli/releases/latest/linux/stripe_linux_x86_64.tar.gz -o stripe.tar.gz
+curl -L https://github.com/stripe/stripe-cli/releases/download/v1.18.0/stripe_1.18.0_linux_x86_64.tar.gz -o stripe.tar.gz
 tar -xzf stripe.tar.gz
-sudo mv stripe /usr/local/bin/
+sudo mv stripe /usr/local/bin/stripe
+stripe --version
 ```
 
-**Verify Installation:**
-```bash
-stripe --version
-# Should output: stripe version X.X.X
-```
+**If you need detailed help:** See `STRIPE_CLI_INSTALL_MANUAL.md` for all platforms and troubleshooting.
 
 ---
 
